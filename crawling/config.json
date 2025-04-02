@@ -1,0 +1,97 @@
+{
+  "news_sources": {
+    "reuters": {
+      "base_url": "https://www.reuters.com",
+      "search_url": "https://www.reuters.com/search/news?blob={keyword}&sortBy=date&dateRange={date_range}",
+      "latest_url": "https://www.reuters.com/business/finance",
+      "article_selector": ".search-result-title a",
+      "content_selector": ".article-body__content__17Yit p",
+      "date_selector": ".article-header__meta__1i0gl time",
+      "date_format": "%B %d, %Y"
+    },
+    "bloomberg": {
+      "base_url": "https://www.bloomberg.com",
+      "search_url": "https://www.bloomberg.com/search?query={keyword}&time={date_range}",
+      "latest_url": "https://www.bloomberg.com/markets",
+      "article_selector": ".search-result-story__headline a",
+      "content_selector": ".body-copy p",
+      "date_selector": ".article-stamp time",
+      "date_format": "%Y-%m-%d"
+    },
+    "financial_times": {
+      "base_url": "https://www.ft.com",
+      "search_url": "https://www.ft.com/search?q={keyword}&dateTo={date_to}&dateFrom={date_from}",
+      "latest_url": "https://www.ft.com/markets",
+      "article_selector": ".o-teaser__heading a",
+      "content_selector": ".article__content p",
+      "date_selector": ".o-date",
+      "date_format": "%Y-%m-%d"
+    },
+    "cnbc": {
+      "base_url": "https://www.cnbc.com",
+      "search_url": "https://www.cnbc.com/search/?query={keyword}&qsearchterm={keyword}",
+      "latest_url": "https://www.cnbc.com/finance/",
+      "article_selector": ".resultlink a",
+      "content_selector": ".group p",
+      "date_selector": ".DateTimeDisplay",
+      "date_format": "%Y-%m-%d"
+    },
+    "wsj": {
+      "base_url": "https://www.wsj.com",
+      "search_url": "https://www.wsj.com/search?query={keyword}&page={page}&isToggleOn=true&operator=AND&sort=date-desc&duration={date_range}",
+      "latest_url": "https://www.wsj.com/finance",
+      "article_selector": ".headline a",
+      "content_selector": ".article-content p",
+      "date_selector": ".timestamp",
+      "date_format": "%Y-%m-%d"
+    }
+  },
+  "request_settings": {
+    "timeout": 30,
+    "retries": 3,
+    "retry_delay": 2,
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+    "headers": {
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+      "Accept-Language": "en-US,en;q=0.5"
+    },
+    "proxy": null
+  },
+  "rate_limits": {
+    "requests_per_minute": 10,
+    "pause_between_requests": 6
+  },
+  "storage": {
+    "mongodb": {
+      "news_collection": "financial_news",
+      "sentiment_collection": "news_sentiment",
+      "stock_data_collection": "stock_data",
+      "crypto_data_collection": "crypto_data"
+    }
+  },
+  "sentiment_analysis": {
+    "model": "finbert",
+    "batch_size": 16,
+    "threshold": {
+      "positive": 0.6,
+      "negative": 0.6
+    }
+  },
+  "stock_data": {
+    "default_period": "1y",
+    "default_interval": "1d",
+    "technical_indicators": [
+      "sma",
+      "ema",
+      "rsi",
+      "macd",
+      "bollinger_bands"
+    ],
+    "moving_averages": [20, 50, 200]
+  },
+  "scheduler": {
+    "news_update_interval": "6h",
+    "stock_data_update_interval": "24h",
+    "sentiment_analysis_interval": "6h"
+  }
+}

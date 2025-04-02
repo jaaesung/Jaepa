@@ -1,0 +1,65 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 가상환경
+venv/
+env/
+ENV/
+.env
+
+# 로그 및 임시 파일
+*.log
+*.tmp
+.DS_Store
+*.swp
+*~
+*.bak
+
+# IDE 파일
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.project
+.pydevproject
+.settings/
+
+# 데이터베이스
+*.db
+*.sqlite3
+*.rdb
+
+# 배포 및 설정 파일
+*.pem
+*.key
+*.crt
+*.env.local
+*.env.development
+*.env.test
+*.env.production
+
+# 로컬 파일
+schedule.json
+data/
+
+# Jupyter Notebook
+.ipynb_checkpoints
