@@ -1,7 +1,7 @@
 """
 주식 및 암호화폐 데이터 수집 모듈
 
-yfinance 라이브러리와 CoinGecko API를 사용하여 주식 및 암호화폐 데이터를 수집합니다.
+Polygon.io API를 사용하여 주식 및 암호화폐 데이터를 수집합니다.
 """
 import json
 import logging
@@ -13,7 +13,6 @@ from typing import Dict, List, Optional, Union, Any
 
 import pandas as pd
 import numpy as np
-import yfinance as yf
 import requests
 from pymongo import MongoClient
 import pymongo
@@ -40,7 +39,7 @@ class StockDataCrawler:
     """
     주식 및 암호화폐 데이터 수집 클래스
 
-    yfinance 및 CoinGecko API를 사용하여 금융 데이터를 수집하고 기술적 지표를 계산합니다.
+    Polygon.io API를 사용하여 금융 데이터를 수집하고 기술적 지표를 계산합니다.
     """
 
     def __init__(self, db_connect: bool = True):
@@ -81,55 +80,62 @@ class StockDataCrawler:
             self.stock_collection = None
             self.crypto_collection = None
 
-    def get_stock_data(self, symbol: str, start_date: Optional[str] = None, 
-                       end_date: Optional[str] = None, period: Optional[str] = None, 
-                       interval: Optional[str] = None) -> pd.DataFrame:
+    def get_stock_data_polygon(self, symbol: str, from_date: str, to_date: str) -> pd.DataFrame:
         """
-        주식 데이터 수집
-
+        Polygon.io API를 사용하여 주식 데이터 수집
+        
         Args:
             symbol: 주식 심볼 (예: AAPL)
-            start_date: 시작 날짜 (YYYY-MM-DD)
-            end_date: 종료 날짜 (YYYY-MM-DD)
-            period: 기간 (1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max)
-            interval: 간격 (1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo)
-
+            from_date: 시작 날짜 (YYYY-MM-DD)
+            to_date: 종료 날짜 (YYYY-MM-DD)
+            
         Returns:
             pd.DataFrame: 주식 데이터
         """
         try:
-            period = period or self.stock_config['default_period']
-            interval = interval or self.stock_config['default_interval']
-            
-            # yfinance 티커 객체 생성
-            ticker = yf.Ticker(symbol)
-            
-            # 날짜 범위 지정 시 해당 범위 사용, 아니면 기본 기간 사용
-            if start_date and end_date:
-                data = ticker.history(start=start_date, end=end_date, interval=interval)
-            else:
-                data = ticker.history(period=period, interval=interval)
-                
-            # 빈 데이터프레임인 경우 처리
-            if data.empty:
-                logger.warning(f"주식 데이터 없음: {symbol}")
+            api_key = os.getenv("POLYGON_API_KEY")
+            if not api_key:
+                logger.error("Polygon API 키가 설정되지 않았습니다.")
                 return pd.DataFrame()
                 
-            # 인덱스를 날짜 컬럼으로 변환
-            data = data.reset_index()
-            data = data.rename(columns={'Date': 'date', 'Open': 'open', 'High': 'high', 
-                                       'Low': 'low', 'Close': 'close', 'Volume': 'volume'})
+            base_url = "https://api.polygon.io/v2/aggs/ticker"
+            url = f"{base_url}/{symbol}/range/1/day/{from_date}/{to_date}?apiKey={api_key}"
             
-            # 날짜 형식 변환
-            data['date'] = pd.to_datetime(data['date']).dt.strftime('%Y-%m-%d')
+            response = requests.get(url)
+            
+            if response.status_code != 200:
+                logger.error(f"Polygon API 오류 ({response.status_code}): {response.text}")
+                return pd.DataFrame()
+                
+            data = response.json()
+            
+            if not data.get('results'):
+                logger.warning(f"Polygon API에서 데이터를 찾을 수 없습니다: {symbol}")
+                return pd.DataFrame()
+                
+            # 결과를 데이터프레임으로 변환
+            df = pd.DataFrame(data['results'])
+            
+            # 컬럼 이름 변경
+            df = df.rename(columns={
+                'v': 'volume',
+                'o': 'open',
+                'c': 'close',
+                'h': 'high',
+                'l': 'low',
+                't': 'timestamp'
+            })
+            
+            # 타임스탬프를 날짜로 변환 (밀리초에서 변환)
+            df['date'] = pd.to_datetime(df['timestamp'], unit='ms').dt.strftime('%Y-%m-%d')
             
             # 추가 정보 컬럼
-            data['symbol'] = symbol
-            data['crawled_date'] = datetime.now().strftime('%Y-%m-%d')
+            df['symbol'] = symbol
+            df['crawled_date'] = datetime.now().strftime('%Y-%m-%d')
             
             # MongoDB에 저장
             if self.stock_collection:
-                data_dicts = data.to_dict('records')
+                data_dicts = df.to_dict('records')
                 for record in data_dicts:
                     # 이미 존재하는 레코드는 업데이트
                     self.stock_collection.update_one(
@@ -137,90 +143,155 @@ class StockDataCrawler:
                         {"$set": record},
                         upsert=True
                     )
-                logger.info(f"{symbol} 주식 데이터 저장 완료 ({len(data)} 레코드)")
+                logger.info(f"{symbol} 주식 데이터 저장 완료 ({len(df)} 레코드)")
                 
-            return data
+            return df
+            
+        except Exception as e:
+            logger.error(f"Polygon API 데이터 수집 실패: {symbol} - {str(e)}")
+            return pd.DataFrame()
+
+    def get_stock_data(self, symbol: str, start_date: Optional[str] = None, 
+                       end_date: Optional[str] = None, period: Optional[str] = None, 
+                       interval: Optional[str] = None) -> pd.DataFrame:
+        """
+        주식 데이터 수집 (Polygon.io API 사용)
+
+        Args:
+            symbol: 주식 심볼 (예: AAPL)
+            start_date: 시작 날짜 (YYYY-MM-DD)
+            end_date: 종료 날짜 (YYYY-MM-DD)
+            period: 기간 (1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max)
+            interval: 간격 (1d, 1wk, 1mo) - 현재 Polygon에서는 1d만 지원
+
+        Returns:
+            pd.DataFrame: 주식 데이터
+        """
+        try:
+            # 날짜 범위 계산
+            if not end_date:
+                end_date = datetime.now().strftime('%Y-%m-%d')
+                
+            if not start_date:
+                if period:
+                    # 기간을 기준으로 시작 날짜 계산
+                    days_map = {
+                        '1d': 1, '5d': 5, '1mo': 30, '3mo': 90, 
+                        '6mo': 180, '1y': 365, '2y': 730, '5y': 1825,
+                        'max': 3650  # 약 10년
+                    }
+                    days = days_map.get(period, 30)
+                    start_date = (datetime.now() - timedelta(days=days)).strftime('%Y-%m-%d')
+                else:
+                    # 기본 기간은 1개월
+                    start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+            
+            # Polygon API 사용
+            return self.get_stock_data_polygon(symbol, start_date, end_date)
             
         except Exception as e:
             logger.error(f"주식 데이터 수집 실패: {symbol} - {str(e)}")
             return pd.DataFrame()
 
-    def get_crypto_data(self, symbol: str, days: int = 30) -> pd.DataFrame:
+    def get_crypto_data_polygon(self, symbol: str, from_date: str, to_date: str) -> pd.DataFrame:
         """
-        암호화폐 데이터 수집 (CoinGecko API)
-
+        Polygon.io API를 사용하여 암호화폐 데이터 수집
+        
         Args:
-            symbol: 암호화폐 ID (예: bitcoin, ethereum)
-            days: 수집할 일수 (1~90)
-
+            symbol: 암호화폐 심볼 (예: X:BTC-USD)
+            from_date: 시작 날짜 (YYYY-MM-DD)
+            to_date: 종료 날짜 (YYYY-MM-DD)
+            
         Returns:
             pd.DataFrame: 암호화폐 데이터
         """
         try:
-            # 암호화폐 ID 확인 (소문자로 변환)
-            crypto_id = symbol.lower()
+            api_key = os.getenv("POLYGON_API_KEY")
+            if not api_key:
+                logger.error("Polygon API 키가 설정되지 않았습니다.")
+                return pd.DataFrame()
             
-            # CoinGecko API URL
-            url = f"https://api.coingecko.com/api/v3/coins/{crypto_id}/market_chart"
-            params = {
-                "vs_currency": "usd",
-                "days": min(days, 90),  # CoinGecko 무료 API 제한
-                "interval": "daily"
-            }
-            
-            # API 키가 있으면 추가
-            api_key = os.getenv("COINGECKO_API_KEY")
-            if api_key:
-                params["x_cg_api_key"] = api_key
+            # 암호화폐 티커 포맷 확인 (Polygon은 보통 X:BTC-USD 형식을 사용)
+            if not symbol.startswith("X:"):
+                crypto_symbol = f"X:{symbol}-USD"
+            else:
+                crypto_symbol = symbol
                 
-            # API 요청
-            response = requests.get(url, params=params)
+            base_url = "https://api.polygon.io/v2/aggs/ticker"
+            url = f"{base_url}/{crypto_symbol}/range/1/day/{from_date}/{to_date}?apiKey={api_key}"
+            
+            response = requests.get(url)
             
             if response.status_code != 200:
-                logger.error(f"CoinGecko API 오류 ({response.status_code}): {crypto_id}")
+                logger.error(f"Polygon API 오류 ({response.status_code}): {response.text}")
                 return pd.DataFrame()
                 
-            # JSON 응답 파싱
             data = response.json()
             
-            # 가격, 거래량, 시가총액 데이터 추출
-            prices = data.get('prices', [])
-            volumes = data.get('total_volumes', [])
-            market_caps = data.get('market_caps', [])
-            
-            # 데이터프레임 변환
-            df_list = []
-            
-            for i in range(min(len(prices), len(volumes), len(market_caps))):
-                timestamp = prices[i][0] / 1000  # 밀리초에서 초로 변환
-                date = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d')
+            if not data.get('results'):
+                logger.warning(f"Polygon API에서 데이터를 찾을 수 없습니다: {crypto_symbol}")
+                return pd.DataFrame()
                 
-                record = {
-                    'date': date,
-                    'symbol': crypto_id,
-                    'price': prices[i][1],
-                    'volume': volumes[i][1],
-                    'market_cap': market_caps[i][1],
-                    'crawled_date': datetime.now().strftime('%Y-%m-%d')
-                }
-                df_list.append(record)
-                
-            df = pd.DataFrame(df_list)
+            # 결과를 데이터프레임으로 변환
+            df = pd.DataFrame(data['results'])
+            
+            # 컬럼 이름 변경
+            df = df.rename(columns={
+                'v': 'volume',
+                'o': 'open',
+                'c': 'close',
+                'h': 'high',
+                'l': 'low',
+                't': 'timestamp',
+                'vw': 'volume_weighted_price'
+            })
+            
+            # 타임스탬프를 날짜로 변환 (밀리초에서 변환)
+            df['date'] = pd.to_datetime(df['timestamp'], unit='ms').dt.strftime('%Y-%m-%d')
+            
+            # 추가 정보 컬럼
+            df['symbol'] = symbol
+            df['price'] = df['close']  # 호환성을 위해 price 컬럼 추가
+            df['crawled_date'] = datetime.now().strftime('%Y-%m-%d')
             
             # MongoDB에 저장
             if self.crypto_collection:
-                for record in df_list:
+                data_dicts = df.to_dict('records')
+                for record in data_dicts:
                     self.crypto_collection.update_one(
                         {"symbol": record["symbol"], "date": record["date"]},
                         {"$set": record},
                         upsert=True
                     )
-                logger.info(f"{crypto_id} 암호화폐 데이터 저장 완료 ({len(df)} 레코드)")
-                
+                logger.info(f"{symbol} 암호화폐 데이터 저장 완료 ({len(df)} 레코드)")
+            
             return df
             
         except Exception as e:
-            logger.error(f"암호화폐 데이터 수집 실패: {crypto_id} - {str(e)}")
+            logger.error(f"암호화폐 데이터 수집 실패: {symbol} - {str(e)}")
+            return pd.DataFrame()
+
+    def get_crypto_data(self, symbol: str, days: int = 30) -> pd.DataFrame:
+        """
+        암호화폐 데이터 수집 (Polygon.io API 사용)
+
+        Args:
+            symbol: 암호화폐 ID (예: BTC, ETH)
+            days: 수집할 일수
+
+        Returns:
+            pd.DataFrame: 암호화폐 데이터
+        """
+        try:
+            # 날짜 범위 계산
+            end_date = datetime.now().strftime('%Y-%m-%d')
+            start_date = (datetime.now() - timedelta(days=days)).strftime('%Y-%m-%d')
+            
+            # Polygon API 사용
+            return self.get_crypto_data_polygon(symbol, start_date, end_date)
+            
+        except Exception as e:
+            logger.error(f"암호화폐 데이터 수집 실패: {symbol} - {str(e)}")
             return pd.DataFrame()
 
     def calculate_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
@@ -310,19 +381,15 @@ class StockDataCrawler:
                 # MACD 히스토그램
                 df['macd_hist'] = df['macd'] - df['macd_signal']
                 
-            # 배당금 및 분할 데이터가 있으면 배당수익률 계산
-            if 'Dividends' in data.columns and 'Stock Splits' in data.columns:
-                df['dividend_yield'] = (df['Dividends'] / df['close']) * 100
-                
             return df
             
         except Exception as e:
             logger.error(f"기술적 지표 계산 실패: {str(e)}")
             return data
 
-    def get_stock_info(self, symbol: str) -> Dict[str, Any]:
+    def get_stock_info_polygon(self, symbol: str) -> Dict[str, Any]:
         """
-        주식 기본 정보 조회
+        Polygon.io API를 사용하여 주식 기본 정보 조회
 
         Args:
             symbol: 주식 심볼 (예: AAPL)
@@ -331,25 +398,37 @@ class StockDataCrawler:
             Dict[str, Any]: 주식 정보
         """
         try:
-            ticker = yf.Ticker(symbol)
+            api_key = os.getenv("POLYGON_API_KEY")
+            if not api_key:
+                logger.error("Polygon API 키가 설정되지 않았습니다.")
+                return {'symbol': symbol, 'error': 'API 키 없음'}
+                
+            url = f"https://api.polygon.io/v3/reference/tickers/{symbol}?apiKey={api_key}"
             
-            # 기본 정보 추출
-            info = ticker.info
+            response = requests.get(url)
+            
+            if response.status_code != 200:
+                logger.error(f"Polygon API 오류 ({response.status_code}): {response.text}")
+                return {'symbol': symbol, 'error': f'API 오류: {response.status_code}'}
+                
+            data = response.json()
+            result = data.get('results', {})
             
             # 필요한 정보만 선택
             stock_info = {
                 'symbol': symbol,
-                'name': info.get('shortName', ''),
-                'sector': info.get('sector', ''),
-                'industry': info.get('industry', ''),
-                'market_cap': info.get('marketCap', None),
-                'pe_ratio': info.get('trailingPE', None),
-                'eps': info.get('trailingEps', None),
-                'dividend_yield': info.get('dividendYield', None),
-                '52_week_high': info.get('fiftyTwoWeekHigh', None),
-                '52_week_low': info.get('fiftyTwoWeekLow', None),
-                'avg_volume': info.get('averageVolume', None),
-                'description': info.get('longBusinessSummary', ''),
+                'name': result.get('name', ''),
+                'type': result.get('type', ''),
+                'market': result.get('market', ''),
+                'primary_exchange': result.get('primary_exchange', ''),
+                'currency': result.get('currency_name', ''),
+                'cik': result.get('cik', ''),
+                'description': result.get('description', ''),
+                'sic_code': result.get('sic_code', ''),
+                'sic_description': result.get('sic_description', ''),
+                'homepage_url': result.get('homepage_url', ''),
+                'total_employees': result.get('total_employees', 0),
+                'list_date': result.get('list_date', ''),
                 'crawled_date': datetime.now().strftime('%Y-%m-%d')
             }
             
@@ -378,7 +457,7 @@ class StockDataCrawler:
             end_date = datetime.now().strftime('%Y-%m-%d')
             
             # 데이터 수집
-            data = self.get_stock_data(symbol, start_date=start_date, end_date=end_date)
+            data = self.get_stock_data_polygon(symbol, start_date, end_date)
             
             if not data.empty:
                 # 기술적 지표 계산
@@ -401,7 +480,9 @@ if __name__ == "__main__":
     crawler = StockDataCrawler(db_connect=False)
     
     # 주식 데이터 수집 테스트
-    data = crawler.get_stock_data("AAPL", period="1mo")
+    end_date = datetime.now().strftime('%Y-%m-%d')
+    start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+    data = crawler.get_stock_data_polygon("AAPL", start_date, end_date)
     
     if not data.empty:
         # 기술적 지표 계산
@@ -412,7 +493,7 @@ if __name__ == "__main__":
         print(data_with_indicators.tail(3))
         
     # 암호화폐 데이터 수집 테스트
-    crypto_data = crawler.get_crypto_data("bitcoin", days=7)
+    crypto_data = crawler.get_crypto_data_polygon("BTC", start_date, end_date)
     
     if not crypto_data.empty:
         print(f"Bitcoin 데이터 수집 완료: {len(crypto_data)} 레코드")

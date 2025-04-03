@@ -12,6 +12,7 @@ import os
 import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Any
+from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
 
@@ -85,7 +86,7 @@ def parse_arguments() -> argparse.Namespace:
     
     # 암호화폐 데이터 가져오기
     crypto_parser = stock_subparsers.add_parser('crypto', help='암호화폐 데이터 가져오기')
-    crypto_parser.add_argument('symbol', help='암호화폐 ID (예: bitcoin)')
+    crypto_parser.add_argument('symbol', help='암호화폐 심볼 (예: BTC, ETH)')
     crypto_parser.add_argument('--days', type=int, default=30, help='가져올 기간(일), 기본값: 30')
     
     # 분석 명령
@@ -200,9 +201,9 @@ def handle_news_command(args: argparse.Namespace) -> None:
         print("-" * 50)
         
         # 더미 데이터
-        today = datetime.datetime.now()
+        today = datetime.now()
         for i in range(args.days):
-            date = (today - datetime.timedelta(days=i)).strftime('%Y-%m-%d')
+            date = (today - timedelta(days=i)).strftime('%Y-%m-%d')
             pos = 0.6 + (i % 3) * 0.1
             neu = 0.3 - (i % 2) * 0.05
             neg = 1 - pos - neu
@@ -284,9 +285,16 @@ def handle_stock_command(args: argparse.Namespace) -> None:
     
     elif args.stock_command == 'crypto':
         logger.info(f"{args.symbol} 암호화폐 데이터 가져오는 중...")
-        data = crawler.get_crypto_data(
+        
+        # 날짜 계산
+        end_date = datetime.now().strftime('%Y-%m-%d')
+        start_date = (datetime.now() - timedelta(days=args.days)).strftime('%Y-%m-%d')
+        
+        # Polygon API 사용
+        data = crawler.get_crypto_data_polygon(
             symbol=args.symbol,
-            days=args.days
+            from_date=start_date,
+            to_date=end_date
         )
         
         if not data.empty:
@@ -360,9 +368,9 @@ def handle_analysis_command(args: argparse.Namespace) -> None:
         print("-" * 60)
         
         # 더미 데이터
-        today = datetime.datetime.now()
+        today = datetime.now()
         for i in range(7):  # 일주일 데이터만 표시
-            date = (today - datetime.timedelta(days=i)).strftime('%Y-%m-%d')
+            date = (today - timedelta(days=i)).strftime('%Y-%m-%d')
             sentiment = 0.6 + (i % 3) * 0.1 - (i % 2) * 0.2
             count = 10 + i
             price_change = 1.2 - i * 0.4
@@ -422,8 +430,8 @@ def handle_schedule_command(args: argparse.Namespace) -> None:
             "type": args.job_type,
             "interval": args.interval,
             "args": job_args,
-            "created_at": datetime.datetime.now().isoformat(),
-            "next_run": (datetime.datetime.now() + datetime.timedelta(hours=args.interval)).isoformat()
+            "created_at": datetime.now().isoformat(),
+            "next_run": (datetime.now() + timedelta(hours=args.interval)).isoformat()
         }
         
         jobs.append(job)
@@ -446,7 +454,7 @@ def handle_schedule_command(args: argparse.Namespace) -> None:
         print("-" * 80)
         
         for job in jobs:
-            next_run = datetime.datetime.fromisoformat(job['next_run']).strftime('%Y-%m-%d %H:%M')
+            next_run = datetime.fromisoformat(job['next_run']).strftime('%Y-%m-%d %H:%M')
             args_str = json.dumps(job['args'])
             print(f"{job['id']}\t{job['type']}\t{job['interval']}\t\t{next_run}\t{args_str}")
     
