@@ -121,5 +121,49 @@
     "news_update_interval": "6h",
     "stock_data_update_interval": "24h",
     "sentiment_analysis_interval": "6h"
+  },
+  "api_sources": {
+    "finnhub": {
+      "default_categories": ["general", "forex", "crypto", "merger"],
+      "rate_limit": {
+        "requests_per_minute": 30,
+        "pause_between_requests": 2
+      }
+    },
+    "newsdata": {
+      "default_categories": ["business", "technology"],
+      "default_country": "us",
+      "rate_limit": {
+        "requests_per_minute": 10,
+        "pause_between_requests": 6
+      }
+    }
+  },
+  "data_normalization": {
+    "title_similarity_threshold": 85,
+    "time_difference_seconds": 300,
+    "field_mapping": {
+      "rss": {
+        "title": "title",
+        "content": "content",
+        "summary": "summary",
+        "link": "url",
+        "published": "published_date"
+      },
+      "finnhub": {
+        "headline": "title",
+        "summary": "summary",
+        "url": "url",
+        "datetime": "published_date",
+        "source": "source"
+      },
+      "newsdata": {
+        "title": "title",
+        "description": "summary",
+        "link": "url",
+        "pubDate": "published_date",
+        "source_id": "source"
+      }
+    }
   }
 }
