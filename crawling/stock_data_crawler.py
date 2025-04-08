@@ -134,7 +134,7 @@ class StockDataCrawler:
             df['crawled_date'] = datetime.now().strftime('%Y-%m-%d')
             
             # MongoDB에 저장
-            if self.stock_collection:
+            if self.stock_collection is not None:
                 data_dicts = df.to_dict('records')
                 for record in data_dicts:
                     # 이미 존재하는 레코드는 업데이트
@@ -255,7 +255,7 @@ class StockDataCrawler:
             df['crawled_date'] = datetime.now().strftime('%Y-%m-%d')
             
             # MongoDB에 저장
-            if self.crypto_collection:
+            if self.crypto_collection is not None:
                 data_dicts = df.to_dict('records')
                 for record in data_dicts:
                     self.crypto_collection.update_one(
