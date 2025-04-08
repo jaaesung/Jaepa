@@ -60,6 +60,7 @@ ENV/
 # 로컬 파일
 schedule.json
 data/
+git_commit.bat
 
 # Jupyter Notebook
 .ipynb_checkpoints

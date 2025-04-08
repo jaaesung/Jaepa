@@ -1,22 +1,11 @@
-RSS 피드 최적화 및 TypeScript 전환
+fix: RSS 피드 무한 로딩 문제 해결 및 요청 타임아웃 추가
 
-1. TODO.md 및 project_status.md 업데이트
-   - 프로젝트 진행 상태 반영
-   - RSS 피드 관련 작업 완료 표시
-   - 프론트엔드 TypeScript 변환 작업 명시
+- RSS 피드 요청 시 requests 라이브러리를 사용하여 타임아웃 설정 추가
+- 피드 파싱 전에 HTTP 상태 코드 확인 및 오류 처리 개선
+- Nasdaq RSS 피드 문제 해결을 위한 fallback URL 추가
+- 예외 처리 로직 개선으로 무한 로딩 방지
+- requirements.txt는 정상 확인됨, 모든 필요 모듈이 포함됨
 
-2. 뉴스 크롤링 시스템 개선
-   - 기존 웹 크롤링 API 관련 함수 사용 중단 처리
-   - RSS 피드 기반으로 뉴스 수집 시스템 통합
-   - 사이트별 RSS 피드 구조 차이에 맞춘 처리기 구현
-   - 각 사이트별 최적화된 검색 및 파싱 로직 추가
-
-3. 프론트엔드 TypeScript 전환
-   - TypeScript 관련 설정 및 의존성 추가
-   - tsconfig.json 설정 파일 작성
-   - 타입 정의 파일 생성 (types/index.ts)
-   - 주요 JS 파일들을 TS로 변환 (App, index, util 등)
-   - Redux 관련 타입 시스템 강화
-
-이번 업데이트로 코드 품질과 안정성이 향상되었으며, TypeScript를 통한 타입 검사로 
-프론트엔드 개발 경험이 개선되었습니다.
+이 변경사항은 특히 Nasdaq RSS 피드 로딩 시 무한 대기하는 문제를 해결합니다.
+feedparser 라이브러리 자체는 타임아웃 설정이 없기 때문에 requests로 먼저 요청하여
+타임아웃을 제어하는 방식으로 변경했습니다.

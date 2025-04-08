@@ -2,7 +2,8 @@
   "rss_feeds": {
     "nasdaq": {
       "name": "Nasdaq",
-      "url": "https://www.nasdaq.com/feed/rssoutbound?category=Markets"
+      "url": "https://www.nasdaq.com/feed/rssoutbound?category=Markets",
+      "fallback_url": "https://www.nasdaq.com/markets/feed"
     },
     "coindesk": {
       "name": "CoinDesk",

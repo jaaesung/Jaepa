@@ -451,8 +451,58 @@ class NewsCrawler:
             logger.info(f"{source_name} RSS 피드에서 뉴스 가져오는 중: {rss_url}")
             
             try:
-                # RSS 피드 파싱
-                feed = feedparser.parse(rss_url)
+                # RSS 피드 파싱 (타임아웃 설정을 위해 requests로 먼저 가져오기)
+                try:
+                    response = requests.get(rss_url, timeout=10)
+                    if response.status_code != 200:
+                        # Nasdaq의 경우 fallback URL 사용 시도
+                        if source_id == "nasdaq" and "fallback_url" in source_config:
+                            logger.warning(f"Nasdaq RSS 기본 URL 실패, fallback URL 시도: {source_config['fallback_url']}")
+                            fallback_response = requests.get(source_config['fallback_url'], timeout=10)
+                            if fallback_response.status_code == 200:
+                                feed = feedparser.parse(fallback_response.content)
+                            else:
+                                logger.error(f"{source_name} RSS fallback URL 접근 실패. 상태 코드: {fallback_response.status_code}")
+                                continue
+                        else:
+                            logger.error(f"{source_name} RSS 피드 접근 실패. 상태 코드: {response.status_code}")
+                            continue
+                    else:
+                        feed = feedparser.parse(response.content)
+                except requests.exceptions.Timeout:
+                    # Nasdaq의 경우 fallback URL 사용 시도
+                    if source_id == "nasdaq" and "fallback_url" in source_config:
+                        try:
+                            logger.warning(f"Nasdaq RSS 기본 URL 타임아웃, fallback URL 시도: {source_config['fallback_url']}")
+                            fallback_response = requests.get(source_config['fallback_url'], timeout=15)  # 타임아웃 증가
+                            if fallback_response.status_code == 200:
+                                feed = feedparser.parse(fallback_response.content)
+                            else:
+                                logger.error(f"{source_name} RSS fallback URL 접근 실패. 상태 코드: {fallback_response.status_code}")
+                                continue
+                        except requests.exceptions.RequestException as e:
+                            logger.error(f"{source_name} RSS fallback URL 요청 실패: {str(e)}")
+                            continue
+                    else:
+                        logger.error(f"{source_name} RSS 피드 요청 타임아웃")
+                        continue
+                except requests.exceptions.RequestException as e:
+                    # Nasdaq의 경우 fallback URL 사용 시도
+                    if source_id == "nasdaq" and "fallback_url" in source_config:
+                        try:
+                            logger.warning(f"Nasdaq RSS 기본 URL 접속 오류, fallback URL 시도: {source_config['fallback_url']}")
+                            fallback_response = requests.get(source_config['fallback_url'], timeout=15)  # 타임아웃 증가
+                            if fallback_response.status_code == 200:
+                                feed = feedparser.parse(fallback_response.content)
+                            else:
+                                logger.error(f"{source_name} RSS fallback URL 접근 실패. 상태 코드: {fallback_response.status_code}")
+                                continue
+                        except requests.exceptions.RequestException as e2:
+                            logger.error(f"{source_name} RSS fallback URL 요청 실패: {str(e2)}")
+                            continue
+                    else:
+                        logger.error(f"{source_name} RSS 피드 요청 실패: {str(e)}")
+                        continue
                 
                 if not feed.entries:
                     logger.warning(f"{source_name}\uc758 피드에 항목이 없습니다.")
@@ -566,7 +616,59 @@ class NewsCrawler:
             try:
                 # 검색 URL이 있는 경우 사용, 없는 경우 기본 URL 사용
                 feed_url = search_url if search_url else rss_url
-                feed = feedparser.parse(feed_url)
+                
+                # RSS 피드 파싱 (타임아웃 설정을 위해 requests로 먼저 가져오기)
+                try:
+                    response = requests.get(feed_url, timeout=10)
+                    if response.status_code != 200:
+                        # Nasdaq의 경우 fallback URL 사용 시도
+                        if source_id == "nasdaq" and "fallback_url" in source_config:
+                            logger.warning(f"Nasdaq RSS 검색 URL 실패, fallback URL 시도: {source_config['fallback_url']}")
+                            fallback_response = requests.get(source_config['fallback_url'], timeout=10)
+                            if fallback_response.status_code == 200:
+                                feed = feedparser.parse(fallback_response.content)
+                            else:
+                                logger.error(f"{source_name} RSS fallback URL 접근 실패. 상태 코드: {fallback_response.status_code}")
+                                continue
+                        else:
+                            logger.error(f"{source_name} RSS 피드 접근 실패. 상태 코드: {response.status_code}")
+                            continue
+                    else:
+                        feed = feedparser.parse(response.content)
+                except requests.exceptions.Timeout:
+                    # Nasdaq의 경우 fallback URL 사용 시도
+                    if source_id == "nasdaq" and "fallback_url" in source_config:
+                        try:
+                            logger.warning(f"Nasdaq RSS 검색 URL 타임아웃, fallback URL 시도: {source_config['fallback_url']}")
+                            fallback_response = requests.get(source_config['fallback_url'], timeout=15)  # 타임아웃 증가
+                            if fallback_response.status_code == 200:
+                                feed = feedparser.parse(fallback_response.content)
+                            else:
+                                logger.error(f"{source_name} RSS fallback URL 접근 실패. 상태 코드: {fallback_response.status_code}")
+                                continue
+                        except requests.exceptions.RequestException as e:
+                            logger.error(f"{source_name} RSS fallback URL 요청 실패: {str(e)}")
+                            continue
+                    else:
+                        logger.error(f"{source_name} RSS 피드 요청 타임아웃")
+                        continue
+                except requests.exceptions.RequestException as e:
+                    # Nasdaq의 경우 fallback URL 사용 시도
+                    if source_id == "nasdaq" and "fallback_url" in source_config:
+                        try:
+                            logger.warning(f"Nasdaq RSS 검색 URL 접속 오류, fallback URL 시도: {source_config['fallback_url']}")
+                            fallback_response = requests.get(source_config['fallback_url'], timeout=15)  # 타임아웃 증가
+                            if fallback_response.status_code == 200:
+                                feed = feedparser.parse(fallback_response.content)
+                            else:
+                                logger.error(f"{source_name} RSS fallback URL 접근 실패. 상태 코드: {fallback_response.status_code}")
+                                continue
+                        except requests.exceptions.RequestException as e2:
+                            logger.error(f"{source_name} RSS fallback URL 요청 실패: {str(e2)}")
+                            continue
+                    else:
+                        logger.error(f"{source_name} RSS 피드 요청 실패: {str(e)}")
+                        continue
                 
                 if not feed.entries:
                     logger.warning(f"{source_name}\uc758 피드에 항목이 없습니다.")
