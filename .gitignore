@@ -61,6 +61,24 @@ ENV/
 schedule.json
 data/
 git_commit.bat
+share/
+Share/
+
+# 로컬 스크립트 및 도구
+scripts/
+Scripts/
+*.sh
+*.bat
+*.cfg
+*.config
+*.conf
+check_git_status.sh
+commit_instructions.sh
+fix_git_tracking.sh
+
+# 기타 제외할 디렉토리
+__pycache__/
+.pytest_cache/
 
 # Jupyter Notebook
 .ipynb_checkpoints
