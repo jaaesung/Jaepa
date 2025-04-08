@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional, Union, Any
 
+import feedparser
 import requests
 from bs4 import BeautifulSoup
 import pymongo
@@ -54,6 +55,7 @@ class NewsCrawler:
         """
         self.config = CONFIG
         self.sources = self.config['news_sources']
+        self.rss_feeds = self.config['rss_feeds']
         self.request_settings = self.config['request_settings']
         self.rate_limits = self.config['rate_limits']
 
@@ -190,7 +192,7 @@ class NewsCrawler:
                         article_url = source_config['base_url'] + article_url
                         
                     # 이미 수집된 기사 건너뛰기
-                    if self.news_collection and self.news_collection.find_one({"url": article_url}):
+                    if self.news_collection is not None and self.news_collection.find_one({"url": article_url}) is not None:
                         logger.debug(f"이미 수집된 기사: {article_url}")
                         continue
                         
@@ -200,7 +202,7 @@ class NewsCrawler:
                         all_articles.append(article_data)
                         
                         # MongoDB에 저장
-                        if self.news_collection:
+                        if self.news_collection is not None:
                             try:
                                 self.news_collection.insert_one(article_data)
                                 logger.debug(f"기사 저장됨: {article_url}")
@@ -261,7 +263,7 @@ class NewsCrawler:
                         article_url = source_config['base_url'] + article_url
                         
                     # 이미 수집된 기사 건너뛰기
-                    if self.news_collection and self.news_collection.find_one({"url": article_url}):
+                    if self.news_collection is not None and self.news_collection.find_one({"url": article_url}) is not None:
                         logger.debug(f"이미 수집된 기사: {article_url}")
                         continue
                         
@@ -271,7 +273,7 @@ class NewsCrawler:
                         all_articles.append(article_data)
                         
                         # MongoDB에 저장
-                        if self.news_collection:
+                        if self.news_collection is not None:
                             try:
                                 self.news_collection.insert_one(article_data)
                                 logger.debug(f"기사 저장됨: {article_url}")
@@ -389,6 +391,161 @@ class NewsCrawler:
         감성 분석기 초기화
         """
         self.sentiment_analyzer = SentimentAnalyzer()
+
+    def get_news_from_rss(self, sources: Optional[List[str]] = None, count: int = 10) -> List[Dict[str, Any]]:
+        """
+        RSS 피드에서 최신 뉴스 가져오기
+
+        Args:
+            sources: RSS 소스 목록 (None인 경우 모든 소스)
+            count: 각 소스별 가져올 기사 수
+
+        Returns:
+            List[Dict[str, Any]]: 수집된 뉴스 기사 목록
+        """
+        if sources is None:
+            sources = list(self.rss_feeds.keys())
+        else:
+            # 존재하지 않는 소스 필터링
+            sources = [s for s in sources if s in self.rss_feeds]
+            
+        if not sources:
+            logger.warning("유효한 RSS 피드가 지정되지 않았습니다.")
+            return []
+            
+        all_articles = []
+        
+        for source_id in sources:
+            source_config = self.rss_feeds[source_id]
+            source_name = source_config['name']
+            rss_url = source_config['url']
+            
+            logger.info(f"{source_name} RSS 피드에서 뉴스 가져오는 중: {rss_url}")
+            
+            try:
+                # RSS 피드 파싱
+                feed = feedparser.parse(rss_url)
+                
+                if not feed.entries:
+                    logger.warning(f"{source_name}\uc758 피드에 항목이 없습니다.")
+                    continue
+                    
+                # 각 소스에서 count개의 기사만 가져오기
+                for entry in feed.entries[:count]:
+                    try:
+                        article_url = entry.link
+                        
+                        # 이미 수집된 기사 건너뛰기
+                        if self.news_collection is not None and self.news_collection.find_one({"url": article_url}) is not None:
+                            logger.debug(f"이미 수집된 기사: {article_url}")
+                            continue
+                            
+                        # 날짜 파싱
+                        published_date = None
+                        if hasattr(entry, 'published_parsed') and entry.published_parsed:
+                            published_date = datetime(*entry.published_parsed[:6]).isoformat()
+                        elif hasattr(entry, 'updated_parsed') and entry.updated_parsed:
+                            published_date = datetime(*entry.updated_parsed[:6]).isoformat()
+                        else:
+                            published_date = datetime.now().isoformat()
+                            
+                        # 내용 추출
+                        content = ""
+                        if hasattr(entry, 'content') and entry.content:
+                            content = entry.content[0].value
+                        elif hasattr(entry, 'summary') and entry.summary:
+                            content = entry.summary
+                        elif hasattr(entry, 'description') and entry.description:
+                            content = entry.description
+                            
+                        # HTML 태그 제거
+                        content = BeautifulSoup(content, 'html.parser').get_text()
+                            
+                        # 키워드 추출
+                        title = entry.title
+                        keywords = self._extract_keywords(title + " " + content)
+                        
+                        # 감성 분석
+                        sentiment = None
+                        if self.sentiment_analyzer:
+                            sentiment = self.sentiment_analyzer.analyze(content)
+                            
+                        article_data = {
+                            "url": article_url,
+                            "title": title,
+                            "content": content,
+                            "source": source_name,
+                            "published_date": published_date,
+                            "crawled_date": datetime.now().isoformat(),
+                            "keywords": keywords,
+                            "sentiment": sentiment,
+                            "source_type": "rss"
+                        }
+                        
+                        all_articles.append(article_data)
+                        
+                        # MongoDB에 저장
+                        if self.news_collection is not None:
+                            try:
+                                self.news_collection.insert_one(article_data)
+                                logger.debug(f"RSS 기사 저장됨: {article_url}")
+                            except pymongo.errors.DuplicateKeyError:
+                                logger.debug(f"중복 기사: {article_url}")
+                            except Exception as e:
+                                logger.error(f"기사 저장 실패: {str(e)}")
+                                
+                    except Exception as e:
+                        logger.error(f"RSS 항목 처리 중 오류: {str(e)}")
+                        
+                # 요청 간 대기 (RSS 서버 부하 경감)
+                time.sleep(1)
+                
+            except Exception as e:
+                logger.error(f"RSS 피드 포구 중 오류: {str(e)}")
+                
+        return all_articles
+
+    def search_news_from_rss(self, keyword: str, days: int = 7, sources: Optional[List[str]] = None) -> List[Dict[str, Any]]:
+        """
+        RSS 피드에서 키워드로 뉴스 검색
+
+        Args:
+            keyword: 검색 키워드
+            days: 검색할 기간(일)
+            sources: RSS 소스 목록 (None인 경우 모든 소스)
+
+        Returns:
+            List[Dict[str, Any]]: 수집된 뉴스 기사 목록
+        """
+        # 모든 기사를 가져오면서 하들에서 키워드 검색
+        all_articles = self.get_news_from_rss(sources=sources, count=50)  # 더 많은 기사를 가져와서 키워드로 필터링
+        
+        # 기간 설정 (일 수)
+        date_limit = datetime.now() - timedelta(days=days)
+        
+        # 검색어로 필터링 및 날짜 필터링
+        filtered_articles = []
+        keyword_lower = keyword.lower()
+        
+        for article in all_articles:
+            # 제목과 내용에서 키워드 검색
+            title = article.get('title', '').lower()
+            content = article.get('content', '').lower()
+            
+            # 날짜 필터링
+            try:
+                article_date = datetime.fromisoformat(article['published_date'])
+                if article_date < date_limit:
+                    continue
+            except (ValueError, KeyError):
+                # 날짜 형식이 잘못되었거나 날짜가 없는 경우, 현재 날짜 사용
+                pass
+                
+            # 키워드 검색
+            if keyword_lower in title or keyword_lower in content:
+                filtered_articles.append(article)
+                
+        return filtered_articles
 
     def close(self):
         """

@@ -1,5 +1,33 @@
 {
+  "rss_feeds": {
+    "nasdaq": {
+      "name": "Nasdaq",
+      "url": "https://www.nasdaq.com/feed/rssoutbound?category=Markets"
+    },
+    "coindesk": {
+      "name": "CoinDesk",
+      "url": "https://www.coindesk.com/arc/outboundfeeds/rss/"
+    },
+    "cointelegraph": {
+      "name": "CoinTelegraph",
+      "url": "https://cointelegraph.com/rss"
+    },
+    "investing": {
+      "name": "Investing.com",
+      "url": "https://www.investing.com/rss/news.rss"
+    }
+  },
+  
   "news_sources": {
+    "yahoo_finance": {
+      "base_url": "https://finance.yahoo.com",
+      "search_url": "https://finance.yahoo.com/search?q={keyword}",
+      "latest_url": "https://finance.yahoo.com/news/",
+      "article_selector": ".js-content-viewer h3 a",
+      "content_selector": ".caas-body p",
+      "date_selector": "time",
+      "date_format": "%Y-%m-%d"
+    },
     "reuters": {
       "base_url": "https://www.reuters.com",
       "search_url": "https://www.reuters.com/search/news?blob={keyword}&sortBy=date&dateRange={date_range}",

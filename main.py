@@ -139,7 +139,8 @@ def handle_news_command(args: argparse.Namespace) -> None:
     
     if args.news_command == 'search':
         logger.info(f"키워드 '{args.keyword}'로 뉴스 검색 중...")
-        articles = crawler.search_news(
+        # RSS 피드를 통한 검색 (보다 안정적)
+        articles = crawler.search_news_from_rss(
             keyword=args.keyword,
             days=args.days,
             sources=args.sources
@@ -165,7 +166,8 @@ def handle_news_command(args: argparse.Namespace) -> None:
     
     elif args.news_command == 'latest':
         logger.info("최신 뉴스 가져오는 중...")
-        articles = crawler.get_latest_news(
+        # RSS 피드를 통한 최신 뉴스 가져오기
+        articles = crawler.get_news_from_rss(
             sources=args.sources,
             count=args.count
         )
