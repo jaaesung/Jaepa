@@ -3,22 +3,30 @@
     "nasdaq": {
       "name": "Nasdaq",
       "url": "https://www.nasdaq.com/feed/rssoutbound?category=Markets",
-      "fallback_url": "https://www.nasdaq.com/markets/feed"
+      "fallback_url": "https://www.nasdaq.com/feed/rssoutbound"
     },
     "coindesk": {
       "name": "CoinDesk",
-      "url": "https://www.coindesk.com/arc/outboundfeeds/rss/"
+      "url": "https://www.coindesk.com/arc/outboundfeeds/rss/",
+      "fallback_url": "https://www.coindesk.com/feed"
     },
     "cointelegraph": {
       "name": "CoinTelegraph",
-      "url": "https://cointelegraph.com/rss"
+      "url": "https://cointelegraph.com/rss",
+      "fallback_url": "https://cointelegraph.com/feed"
     },
     "investing": {
       "name": "Investing.com",
-      "url": "https://www.investing.com/rss/news.rss"
+      "url": "https://www.investing.com/rss/news.rss",
+      "fallback_url": "https://www.investing.com/rss/news_285.rss"
+    },
+    "yahoo_finance": {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/news/rssindex",
+      "fallback_url": "https://finance.yahoo.com/rss/topstories"
     }
   },
-  
+
   "news_sources": {
     "yahoo_finance": {
       "base_url": "https://finance.yahoo.com",
@@ -109,13 +117,7 @@
   "stock_data": {
     "default_period": "1y",
     "default_interval": "1d",
-    "technical_indicators": [
-      "sma",
-      "ema",
-      "rsi",
-      "macd",
-      "bollinger_bands"
-    ],
+    "technical_indicators": ["sma", "ema", "rsi", "macd", "bollinger_bands"],
     "moving_averages": [20, 50, 200]
   },
   "scheduler": {

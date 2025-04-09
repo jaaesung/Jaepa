@@ -1,0 +1,9 @@
+{
+  "label": "positive",
+  "score": 0.8,
+  "scores": {
+    "positive": 0.8,
+    "neutral": 0.15,
+    "negative": 0.05
+  }
+}

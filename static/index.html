@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Sentiment Analysis Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            padding-top: 20px;
+            background-color: #f8f9fa;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #f1f8ff;
+            font-weight: bold;
+        }
+        .sentiment-positive {
+            color: #28a745;
+        }
+        .sentiment-negative {
+            color: #dc3545;
+        }
+        .sentiment-neutral {
+            color: #6c757d;
+        }
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="text-center mb-4">Financial Sentiment Analysis Dashboard</h1>
+        
+        <div class="row mb-4">
+            <div class="col-md-6 offset-md-3">
+                <div class="card">
+                    <div class="card-header">Stock Symbol</div>
+                    <div class="card-body">
+                        <div class="input-group">
+                            <input type="text" id="symbolInput" class="form-control" placeholder="Enter stock symbol (e.g., AAPL, MSFT)" value="AAPL">
+                            <button class="btn btn-primary" id="analyzeBtn">Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Sentiment Summary</div>
+                    <div class="card-body">
+                        <div id="sentimentSummary">
+                            <p class="text-center text-muted">Enter a stock symbol and click Analyze to see sentiment summary.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">Sentiment-Price Correlation</div>
+                    <div class="card-body">
+                        <div id="correlationAnalysis">
+                            <p class="text-center text-muted">Enter a stock symbol and click Analyze to see correlation analysis.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Recent News Sentiment</div>
+                    <div class="card-body">
+                        <div id="newsList">
+                            <p class="text-center text-muted">Enter a stock symbol and click Analyze to see recent news.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">Text Sentiment Analysis</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <textarea id="textInput" class="form-control" rows="3" placeholder="Enter financial text to analyze sentiment"></textarea>
+                        </div>
+                        <button id="analyzeTextBtn" class="btn btn-primary">Analyze Text</button>
+                        <div id="textAnalysisResult" class="mt-3">
+                            <!-- Text analysis results will appear here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API endpoints
+        const API_BASE_URL = '/api';
+        const TEXT_ANALYSIS_ENDPOINT = `${API_BASE_URL}/analyze/text`;
+        const NEWS_ANALYSIS_ENDPOINT = `${API_BASE_URL}/analyze/news`;
+        const CORRELATION_ANALYSIS_ENDPOINT = `${API_BASE_URL}/analyze/correlation`;
+        const SUMMARY_ENDPOINT = `${API_BASE_URL}/analyze/summary`;
+
+        // DOM elements
+        const symbolInput = document.getElementById('symbolInput');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const sentimentSummary = document.getElementById('sentimentSummary');
+        const correlationAnalysis = document.getElementById('correlationAnalysis');
+        const newsList = document.getElementById('newsList');
+        const textInput = document.getElementById('textInput');
+        const analyzeTextBtn = document.getElementById('analyzeTextBtn');
+        const textAnalysisResult = document.getElementById('textAnalysisResult');
+        const loading = document.getElementById('loading');
+
+        // Show loading indicator
+        function showLoading() {
+            loading.style.display = 'flex';
+        }
+
+        // Hide loading indicator
+        function hideLoading() {
+            loading.style.display = 'none';
+        }
+
+        // Format sentiment with color
+        function formatSentiment(sentiment, score) {
+            let cssClass = '';
+            if (sentiment === 'positive') {
+                cssClass = 'sentiment-positive';
+            } else if (sentiment === 'negative') {
+                cssClass = 'sentiment-negative';
+            } else {
+                cssClass = 'sentiment-neutral';
+            }
+            
+            return `<span class="${cssClass}">${sentiment} (${(score * 100).toFixed(1)}%)</span>`;
+        }
+
+        // Analyze stock
+        async function analyzeStock() {
+            const symbol = symbolInput.value.trim().toUpperCase();
+            
+            if (!symbol) {
+                alert('Please enter a stock symbol');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                // Fetch sentiment summary
+                const summaryResponse = await fetch(SUMMARY_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        symbol: symbol,
+                        days: 7
+                    })
+                });
+                
+                if (!summaryResponse.ok) {
+                    throw new Error(`Failed to fetch sentiment summary: ${summaryResponse.statusText}`);
+                }
+                
+                const summaryData = await summaryResponse.json();
+                
+                // Fetch correlation analysis
+                const correlationResponse = await fetch(CORRELATION_ANALYSIS_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        symbol: symbol,
+                        days: 30
+                    })
+                });
+                
+                if (!correlationResponse.ok) {
+                    throw new Error(`Failed to fetch correlation analysis: ${correlationResponse.statusText}`);
+                }
+                
+                const correlationData = await correlationResponse.json();
+                
+                // Fetch news analysis
+                const newsResponse = await fetch(NEWS_ANALYSIS_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        symbol: symbol,
+                        limit: 5
+                    })
+                });
+                
+                if (!newsResponse.ok) {
+                    throw new Error(`Failed to fetch news analysis: ${newsResponse.statusText}`);
+                }
+                
+                const newsData = await newsResponse.json();
+                
+                // Update UI with results
+                updateSentimentSummary(summaryData);
+                updateCorrelationAnalysis(correlationData);
+                updateNewsList(newsData);
+                
+            } catch (error) {
+                console.error('Error analyzing stock:', error);
+                alert(`Error analyzing stock: ${error.message}`);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Update sentiment summary
+        function updateSentimentSummary(data) {
+            let html = `
+                <h5>${data.symbol} Sentiment (${data.period})</h5>
+                <p>Overall Sentiment: ${formatSentiment(data.sentiment, 1.0)}</p>
+                <div class="progress mb-3" style="height: 25px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: ${data.positive_count / data.total_count * 100}%" 
+                        aria-valuenow="${data.positive_count}" aria-valuemin="0" aria-valuemax="${data.total_count}">
+                        Positive (${data.positive_count})
+                    </div>
+                    <div class="progress-bar bg-secondary" role="progressbar" style="width: ${data.neutral_count / data.total_count * 100}%" 
+                        aria-valuenow="${data.neutral_count}" aria-valuemin="0" aria-valuemax="${data.total_count}">
+                        Neutral (${data.neutral_count})
+                    </div>
+                    <div class="progress-bar bg-danger" role="progressbar" style="width: ${data.negative_count / data.total_count * 100}%" 
+                        aria-valuenow="${data.negative_count}" aria-valuemin="0" aria-valuemax="${data.total_count}">
+                        Negative (${data.negative_count})
+                    </div>
+                </div>
+                <p>${data.summary}</p>
+            `;
+            
+            sentimentSummary.innerHTML = html;
+        }
+
+        // Update correlation analysis
+        function updateCorrelationAnalysis(data) {
+            let html = `
+                <h5>${data.symbol} Correlation (${data.period})</h5>
+                <p><strong>Correlation:</strong> ${isNaN(data.correlation) ? 'N/A' : data.correlation.toFixed(4)}</p>
+                <p><strong>Sentiment Trend:</strong> ${data.sentiment_trend}</p>
+                <p><strong>Price Trend:</strong> ${data.price_trend}</p>
+                <p>${data.analysis}</p>
+            `;
+            
+            correlationAnalysis.innerHTML = html;
+        }
+
+        // Update news list
+        function updateNewsList(data) {
+            if (!data.news || data.news.length === 0) {
+                newsList.innerHTML = `<p class="text-center">No news found for ${data.symbol}</p>`;
+                return;
+            }
+            
+            let html = `<h5>${data.symbol} Recent News (${data.count} articles)</h5><ul class="list-group">`;
+            
+            data.news.forEach(news => {
+                html += `
+                    <li class="list-group-item">
+                        <h6>${news.title}</h6>
+                        <p>Sentiment: ${formatSentiment(news.sentiment, news.score)}</p>
+                        <p class="text-muted small">
+                            ${news.published_date ? `Published: ${news.published_date}` : ''}
+                            ${news.url ? `<a href="${news.url}" target="_blank" class="ms-2">Read more</a>` : ''}
+                        </p>
+                    </li>
+                `;
+            });
+            
+            html += '</ul>';
+            newsList.innerHTML = html;
+        }
+
+        // Analyze text
+        async function analyzeText() {
+            const text = textInput.value.trim();
+            
+            if (!text) {
+                alert('Please enter text to analyze');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const response = await fetch(TEXT_ANALYSIS_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: text
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to analyze text: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                // Update UI with results
+                let html = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Sentiment Analysis Result</h5>
+                            <p class="card-text">Text: "${data.text}"</p>
+                            <p class="card-text">Sentiment: ${formatSentiment(data.sentiment, data.score)}</p>
+                            <h6>Detailed Scores:</h6>
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Positive
+                                    <span class="badge bg-primary rounded-pill">${(data.scores.positive * 100).toFixed(2)}%</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Neutral
+                                    <span class="badge bg-primary rounded-pill">${(data.scores.neutral * 100).toFixed(2)}%</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Negative
+                                    <span class="badge bg-primary rounded-pill">${(data.scores.negative * 100).toFixed(2)}%</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+                
+                textAnalysisResult.innerHTML = html;
+                
+            } catch (error) {
+                console.error('Error analyzing text:', error);
+                alert(`Error analyzing text: ${error.message}`);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Event listeners
+        analyzeBtn.addEventListener('click', analyzeStock);
+        analyzeTextBtn.addEventListener('click', analyzeText);
+        
+        // Allow pressing Enter in the symbol input
+        symbolInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                analyzeStock();
+            }
+        });
+        
+        // Allow pressing Enter in the text input
+        textInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                analyzeText();
+            }
+        });
+    </script>
+</body>
+</html>

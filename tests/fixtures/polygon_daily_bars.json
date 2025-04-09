@@ -1,0 +1,27 @@
+{
+  "results": [
+    {
+      "v": 76286430,
+      "vw": 186.1515,
+      "o": 187.9,
+      "c": 185.92,
+      "h": 188.54,
+      "l": 185.19,
+      "t": 1680307200000,
+      "n": 585416
+    },
+    {
+      "v": 59278090,
+      "vw": 187.5458,
+      "o": 184.51,
+      "c": 187.0,
+      "h": 188.04,
+      "l": 184.28,
+      "t": 1680566400000,
+      "n": 507132
+    }
+  ],
+  "status": "OK",
+  "request_id": "6a7a3a2a4c44c3fb55fe7260bbeb8a7c",
+  "next_url": "https://api.polygon.io/v2/aggs/ticker/AAPL/range/1/day/1680307200000/1680566400000?cursor=YWRqdXN0ZWQ9dHJ1ZSZsaW1pdD0yJnNvcnQ9dCZvcmRlcj1hc2M="
+}
