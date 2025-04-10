@@ -69,11 +69,16 @@ class NewsCrawler:
                 self.db = self.client[mongo_db_name]
                 self.news_collection = self.db[self.config['storage']['mongodb']['news_collection']]
 
-                # 인덱스 생성
-                self.news_collection.create_index([("url", pymongo.ASCENDING)], unique=True)
-                self.news_collection.create_index([("published_date", pymongo.DESCENDING)])
-                self.news_collection.create_index([("source", pymongo.ASCENDING)])
-                self.news_collection.create_index([("keywords", pymongo.TEXT)])
+                # 인덱스 생성 - 이미 존재하는 경우 무시
+                try:
+                    self.news_collection.create_index([("url", pymongo.ASCENDING)], unique=True, name="url_index")
+                    self.news_collection.create_index([("published_date", pymongo.DESCENDING)], name="published_date_index")
+                    self.news_collection.create_index([("source", pymongo.ASCENDING)], name="source_index")
+                    # TEXT 인덱스는 한 컬렉션에 하나만 존재할 수 있으므로 news_sources_enhanced.py와 충돌 방지
+                    # 이 인덱스는 news_sources_enhanced.py에서 생성하도록 함
+                    # self.news_collection.create_index([("keywords", pymongo.TEXT)], name="keywords_text_index")
+                except pymongo.errors.OperationFailure as e:
+                    logger.warning(f"인덱스 생성 중 오류 발생 (이미 존재할 수 있음): {str(e)}")
 
                 logger.info("MongoDB 연결 성공")
             except Exception as e:
@@ -535,11 +540,15 @@ class NewsCrawler:
                         # Nasdaq의 경우 fallback URL 사용 시도
                         if source_id == "nasdaq" and "fallback_url" in source_config:
                             logger.warning(f"Nasdaq RSS 기본 URL 실패, fallback URL 시도: {source_config['fallback_url']}")
-                            fallback_response = requests.get(source_config['fallback_url'], timeout=10)
-                            if fallback_response.status_code == 200:
-                                feed = feedparser.parse(fallback_response.content)
-                            else:
-                                logger.error(f"{source_name} RSS fallback URL 접근 실패. 상태 코드: {fallback_response.status_code}")
+                            try:
+                                fallback_response = requests.get(source_config['fallback_url'], timeout=10)
+                                if fallback_response.status_code == 200:
+                                    feed = feedparser.parse(fallback_response.content)
+                                else:
+                                    logger.error(f"{source_name} RSS fallback URL 접근 실패. 상태 코드: {fallback_response.status_code}")
+                                    continue
+                            except requests.exceptions.RequestException as e:
+                                logger.error(f"{source_name} RSS fallback URL 접근 시 예외 발생: {str(e)}")
                                 continue
                         else:
                             logger.error(f"{source_name} RSS 피드 접근 실패. 상태 코드: {response.status_code}")

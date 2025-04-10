@@ -20,9 +20,15 @@ from bs4 import BeautifulSoup
 import pymongo
 from pymongo import MongoClient
 from dotenv import load_dotenv
+
+# 개선된 요청 모듈 가져오기
+from enhanced_request import make_request_with_retry, get_random_user_agent
 import finnhub
 from dateutil import parser as dateutil_parser
 from rapidfuzz import fuzz
+
+# 통합 API 클라이언트 모듈 가져오기
+from api_clients import FinnhubClient, NewsDataClient, AlphaVantageClient
 
 # 로깅 설정
 logging.basicConfig(
@@ -104,11 +110,15 @@ class NewsSourcesHandler:
                 self.db = self.client[mongo_db_name]
                 self.news_collection = self.db[self.config['storage']['mongodb']['news_collection']]
 
-                # 인덱스 생성
-                self.news_collection.create_index([("url", pymongo.ASCENDING)], unique=True)
-                self.news_collection.create_index([("published_date", pymongo.DESCENDING)])
-                self.news_collection.create_index([("source", pymongo.ASCENDING)])
-                self.news_collection.create_index([("keywords", pymongo.TEXT)])
+                # 인덱스 생성 - 이미 존재하는 경우 무시
+                try:
+                    self.news_collection.create_index([("url", pymongo.ASCENDING)], unique=True, name="url_index")
+                    self.news_collection.create_index([("published_date", pymongo.DESCENDING)], name="published_date_index")
+                    self.news_collection.create_index([("source", pymongo.ASCENDING)], name="source_index")
+                    # TEXT 인덱스 생성 - 이 파일에서만 생성하도록 함
+                    self.news_collection.create_index([("keywords", pymongo.TEXT)], name="keywords_text_index")
+                except pymongo.errors.OperationFailure as e:
+                    logger.warning(f"인덱스 생성 중 오류 발생 (이미 존재할 수 있음): {str(e)}")
 
                 logger.info("MongoDB 연결 성공")
             except Exception as e:
@@ -137,7 +147,8 @@ class NewsSourcesHandler:
         Returns:
             str: 사용자 에이전트 문자열
         """
-        return random.choice(self.user_agents)
+        # 외부 모듈의 함수 사용
+        return get_random_user_agent()
 
     def _rate_limit_check(self, api_name: str) -> bool:
         """
@@ -222,54 +233,16 @@ class NewsSourcesHandler:
         Returns:
             Tuple[int, Optional[str]]: 상태 코드와 응답 내용
         """
+        # 개선된 요청 모듈 사용
         if headers is None:
             headers = {
-                "User-Agent": self._get_random_user_agent(),
+                "User-Agent": get_random_user_agent(),
                 "Accept": "application/json, text/html",
                 "Accept-Language": "en-US,en;q=0.9"
             }
 
-        retries = 0
-
-        while retries < max_retries:
-            try:
-                response = requests.get(url, params=params, headers=headers, timeout=10)
-
-                if response.status_code == 200:
-                    return response.status_code, response.text
-
-                elif response.status_code == 429:  # Too Many Requests
-                    # 레이트 리밋으로 인한 제한, 백오프 후 재시도
-                    wait_time = backoff_factor ** retries
-                    logger.warning(f"레이트 리밋 감지, {wait_time:.2f}초 대기 후 재시도 ({retries+1}/{max_retries})")
-                    time.sleep(wait_time)
-                    retries += 1
-
-                else:
-                    logger.warning(f"HTTP 오류 ({response.status_code}): {url}")
-                    if 400 <= response.status_code < 500:
-                        # 클라이언트 오류는 재시도해도 해결되지 않을 수 있음
-                        return response.status_code, None
-
-                    # 서버 오류는 백오프 후 재시도
-                    wait_time = backoff_factor ** retries
-                    logger.warning(f"서버 오류, {wait_time:.2f}초 대기 후 재시도 ({retries+1}/{max_retries})")
-                    time.sleep(wait_time)
-                    retries += 1
-
-            except requests.exceptions.Timeout:
-                # 타임아웃 발생 시 백오프 후 재시도
-                wait_time = backoff_factor ** retries
-                logger.warning(f"요청 타임아웃, {wait_time:.2f}초 대기 후 재시도 ({retries+1}/{max_retries})")
-                time.sleep(wait_time)
-                retries += 1
-
-            except requests.exceptions.RequestException as e:
-                logger.error(f"요청 예외 발생: {str(e)}")
-                return -1, None
-
-        logger.error(f"최대 재시도 횟수 초과: {url}")
-        return -1, None
+        # 외부 모듈의 함수 호출
+        return make_request_with_retry(url, params, headers, max_retries, backoff_factor)
 
     def search_news_with_apis(self, keyword: str, days: int = 7) -> List[Dict[str, Any]]:
         """
@@ -424,9 +397,17 @@ class NewsSourcesHandler:
         # 2. 키워드가 주식 심볼인 경우 시도
         try:
             # 주식 심볼에 대한 뉴스 가져오기
-            company_news = self.finnhub_client.company_news(
-                keyword.upper(), _from=start_date_str, to=end_date_str
-            )
+            if not self.finnhub_client:
+                logger.warning("Finnhub API 클라이언트가 초기화되지 않았습니다.")
+                company_news = []
+            else:
+                try:
+                    company_news = self.finnhub_client.company_news(
+                        keyword.upper(), _from=start_date_str, to=end_date_str
+                    )
+                except Exception as e:
+                    logger.error(f"Finnhub API 호출 중 오류: {str(e)}")
+                    company_news = []
 
             # 뉴스 정규화
             for article in company_news:
@@ -553,7 +534,12 @@ class NewsSourcesHandler:
                 params["page"] = next_page
 
             # API 요청
-            status_code, response_text = self._make_request_with_retry(api_url, params=params)
+            try:
+                status_code, response_text = self._make_request_with_retry(api_url, params=params)
+            except Exception as e:
+                logger.error(f"NewsData.io API 요청 중 오류: {str(e)}")
+                status_code = 500
+                response_text = None
 
             if status_code != 200 or not response_text:
                 logger.error(f"NewsData.io API 응답 오류: {status_code}")

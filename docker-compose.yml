@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # MongoDB 데이터베이스
@@ -29,7 +29,11 @@ services:
       - "8000:8000"
     environment:
       - MONGODB_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/jaepa
-      - JWT_SECRET=${JWT_SECRET}
+      - MONGO_DB_NAME=jaepa
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - REFRESH_TOKEN_EXPIRE_DAYS=7
       - ENVIRONMENT=production
       - LOG_LEVEL=info
       - CORS_ORIGINS=http://localhost:80,http://frontend
@@ -66,6 +70,7 @@ services:
     command: python -m crawling.scheduler
     environment:
       - MONGODB_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/jaepa
+      - MONGO_DB_NAME=jaepa
       - ENVIRONMENT=production
       - LOG_LEVEL=info
     volumes:
@@ -85,6 +90,7 @@ services:
     command: python -m analysis.scheduler_analyzer
     environment:
       - MONGODB_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/jaepa
+      - MONGO_DB_NAME=jaepa
       - ENVIRONMENT=production
       - LOG_LEVEL=info
     volumes:

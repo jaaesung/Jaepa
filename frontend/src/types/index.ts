@@ -96,16 +96,27 @@ export interface AuthState {
 
 // 뉴스 기사 관련 타입
 export interface NewsArticle {
-  id: string;
+  // 백엔드와 호환을 위한 필드 정의
+  id: string; // 백엔드에서는 _id로 사용될 수 있음
   title: string;
-  content: string;
+  content: string; // 백엔드에서는 description으로 사용될 수 있음
   source: string;
-  url: string;
-  publishedDate: string;
+  url: string; // 백엔드에서는 article_url로 사용될 수 있음
+  publishedDate: string; // 백엔드에서는 published_date 또는 published_utc로 사용될 수 있음
+  crawledDate?: string; // 백엔드에서는 crawled_date로 사용될 수 있음
   sentiment?: {
-    positive: number;
-    neutral: number;
-    negative: number;
+    label?: string; // 백엔드에서 사용하는 감성 레이블
+    score?: number; // 백엔드에서 사용하는 감성 점수
+    scores?: {
+      // 백엔드에서 사용하는 상세 점수
+      positive: number;
+      neutral: number;
+      negative: number;
+    };
+    // 프론트엔드에서 사용하는 감성 필드
+    positive?: number;
+    neutral?: number;
+    negative?: number;
   };
   keywords: string[];
 }
