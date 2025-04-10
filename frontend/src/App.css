@@ -1,14 +1,206 @@
+/* 전역 스타일 */
+:root {
+  --primary-color: #1890ff;
+  --primary-hover: #40a9ff;
+  --primary-active: #096dd9;
+  --primary-light: #e6f7ff;
+  
+  --success-color: #52c41a;
+  --success-light: #f6ffed;
+  --warning-color: #faad14;
+  --warning-light: #fffbe6;
+  --error-color: #ff4d4f;
+  --error-light: #fff2f0;
+  
+  --text-color: #333;
+  --text-secondary: #666;
+  --text-light: #999;
+  
+  --bg-color: #fff;
+  --bg-light: #f9f9f9;
+  --bg-dark: #f0f2f5;
+  
+  --border-color: #d9d9d9;
+  --border-light: #f0f0f0;
+  
+  --shadow-base: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.1);
+  
+  --radius-base: 4px;
+  --radius-large: 8px;
+  
+  --transition-base: all 0.3s;
+}
+
+/* 다크 모드 변수 */
+.dark {
+  --primary-color: #177ddc;
+  --primary-hover: #1f6fe5;
+  --primary-active: #388ed3;
+  --primary-light: #111a2c;
+  
+  --success-color: #49aa19;
+  --success-light: #162312;
+  --warning-color: #d89614;
+  --warning-light: #2b2111;
+  --error-color: #a61d24;
+  --error-light: #2a1215;
+  
+  --text-color: #fff;
+  --text-secondary: rgba(255, 255, 255, 0.85);
+  --text-light: rgba(255, 255, 255, 0.45);
+  
+  --bg-color: #141414;
+  --bg-light: #1f1f1f;
+  --bg-dark: #000;
+  
+  --border-color: #434343;
+  --border-light: #303030;
+  
+  --shadow-base: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.55);
+}
+
+/* 기본 스타일 초기화 */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+    'Noto Color Emoji';
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-color);
+  background-color: var(--bg-dark);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: var(--transition-base);
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* 앱 컨테이너 */
 .app {
-  min-height: 100vh;
   display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 로딩 화면 */
+.app-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 18px;
+  color: var(--text-secondary);
+  background-color: var(--bg-light);
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 유틸리티 클래스 */
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.flex-column {
   flex-direction: column;
 }
 
-.app-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  font-size: 1.5rem;
-  color: #4a5568;
+.gap-10 {
+  gap: 10px;
+}
+
+.gap-16 {
+  gap: 16px;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+.mt-24 {
+  margin-top: 24px;
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+.mb-16 {
+  margin-bottom: 16px;
+}
+
+.mb-24 {
+  margin-bottom: 24px;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 576px) {
+  html, body {
+    font-size: 14px;
+  }
 }

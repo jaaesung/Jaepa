@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  # MongoDB 데이터베이스
+  mongodb:
+    image: mongo:latest
+    restart: always
+    container_name: jaepa-mongodb
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    networks:
+      - jaepa-network
+
+  # 백엔드 API 서비스
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    container_name: jaepa-backend
+    depends_on:
+      - mongodb
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/jaepa
+      - JWT_SECRET=${JWT_SECRET}
+      - ENVIRONMENT=production
+      - LOG_LEVEL=info
+      - CORS_ORIGINS=http://localhost:80,http://frontend
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - jaepa-network
+
+  # 프론트엔드 웹 서비스
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: always
+    container_name: jaepa-frontend
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    environment:
+      - REACT_APP_API_URL=/api
+    networks:
+      - jaepa-network
+
+  # 크롤러 서비스 (주기적 실행)
+  crawler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jaepa-crawler
+    depends_on:
+      - mongodb
+      - backend
+    command: python -m crawling.scheduler
+    environment:
+      - MONGODB_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/jaepa
+      - ENVIRONMENT=production
+      - LOG_LEVEL=info
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - jaepa-network
+
+  # 감성 분석 서비스 (주기적 실행)
+  analyzer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jaepa-analyzer
+    depends_on:
+      - mongodb
+      - backend
+    command: python -m analysis.scheduler_analyzer
+    environment:
+      - MONGODB_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/jaepa
+      - ENVIRONMENT=production
+      - LOG_LEVEL=info
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - jaepa-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  jaepa-network:
+    driver: bridge

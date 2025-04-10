@@ -1,218 +1,223 @@
 .dashboard-container {
-  padding: 1.5rem;
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
 .dashboard-header {
-  margin-bottom: 2rem;
+  margin-bottom: 24px;
 }
 
 .dashboard-header h1 {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 0.5rem;
+  font-size: 28px;
+  margin: 0 0 8px 0;
+  color: #333;
 }
 
 .welcome-message {
-  color: #718096;
-  font-size: 1rem;
+  font-size: 16px;
+  color: #666;
+  margin: 0;
 }
 
 .dashboard-content {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 24px;
 }
 
 .dashboard-section {
-  background-color: #ffffff;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 20px;
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 }
 
 .section-header h2 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #2d3748;
+  font-size: 20px;
+  margin: 0;
+  color: #333;
 }
 
 .period-selector {
   display: flex;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
 .period-selector button {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.25rem;
-  background-color: #f7fafc;
-  color: #4a5568;
-  font-size: 0.875rem;
+  padding: 6px 12px;
+  border: 1px solid #d9d9d9;
+  background-color: #fff;
+  border-radius: 4px;
+  font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s;
 }
 
 .period-selector button:hover {
-  background-color: #edf2f7;
+  border-color: #1890ff;
+  color: #1890ff;
 }
 
 .period-selector button.active {
-  background-color: #4299e1;
-  color: white;
-  border-color: #4299e1;
+  background-color: #1890ff;
+  color: #fff;
+  border-color: #1890ff;
 }
 
 .metrics-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .metric-card {
-  background-color: #f8fafc;
-  border-radius: 0.5rem;
-  padding: 1.25rem;
-  transition: transform 0.2s;
+  background-color: #fafafa;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .metric-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .metric-card h3 {
-  font-size: 1rem;
-  color: #4a5568;
-  margin-bottom: 0.75rem;
+  font-size: 16px;
+  margin: 0 0 8px 0;
+  color: #666;
 }
 
 .metric-value {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 0.5rem;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #333;
 }
 
 .metric-change {
-  font-size: 0.875rem;
+  font-size: 14px;
   font-weight: 500;
 }
 
 .metric-change.positive {
-  color: #48bb78;
+  color: #f5222d; /* 한국에서는 빨간색이 상승을 의미함 */
 }
 
 .metric-change.negative {
-  color: #f56565;
+  color: #52c41a; /* 한국에서는 녹색이 하락을 의미함 */
 }
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
 }
 
-.loading-indicator {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  color: #718096;
+/* 뉴스 섹션은 더 넓게 */ 
+.recent-news {
+  grid-column: span 2;
 }
 
-.sentiment-chart-placeholder,
-.stock-chart-placeholder,
-.keyword-cloud-placeholder {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  background-color: #f8fafc;
-  border-radius: 0.5rem;
-  color: #718096;
-  border: 1px dashed #cbd5e0;
+/* 주식 성과 차트 섹션도 더 넓게 */
+.stock-performance {
+  grid-column: span 2;
+}
+
+/* 주가-감성 상관관계 차트 */
+.stock-sentiment-correlation {
+  grid-column: span 2;
 }
 
 .news-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  max-height: 400px;
+  gap: 16px;
+  max-height: 500px;
   overflow-y: auto;
-  padding-right: 0.5rem;
+  padding-right: 10px;
 }
 
-.news-item {
-  padding: 1rem;
-  border-radius: 0.5rem;
-  background-color: #f8fafc;
-  border-left: 4px solid #4299e1;
+.news-list::-webkit-scrollbar {
+  width: 6px;
 }
 
-.news-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 0.25rem;
+.news-list::-webkit-scrollbar-thumb {
+  background-color: #d9d9d9;
+  border-radius: 3px;
 }
 
-.news-source {
-  font-size: 0.75rem;
-  color: #718096;
-  margin-bottom: 0.5rem;
-}
-
-.news-summary {
-  font-size: 0.875rem;
-  color: #4a5568;
-  margin-bottom: 0.5rem;
-  line-height: 1.5;
-}
-
-.news-sentiment {
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.news-sentiment.positive {
-  background-color: #c6f6d5;
-  color: #22543d;
-}
-
-.news-sentiment.negative {
-  background-color: #fed7d7;
-  color: #742a2a;
-}
-
-.news-sentiment.neutral {
-  background-color: #e2e8f0;
-  color: #2d3748;
+.news-list::-webkit-scrollbar-track {
+  background-color: #f0f0f0;
+  border-radius: 3px;
 }
 
 .empty-state {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  color: #a0aec0;
+  padding: 40px;
+  text-align: center;
+  color: #999;
+  font-size: 16px;
+  background-color: #fafafa;
+  border-radius: 4px;
 }
 
-@media (max-width: 768px) {
+.loading-indicator {
+  padding: 40px;
+  text-align: center;
+  color: #666;
+  font-size: 16px;
+}
+
+/* 반응형 레이아웃 */
+@media (max-width: 1200px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
   
+  .recent-news, 
+  .stock-sentiment-correlation,
+  .stock-performance {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 16px;
+  }
+  
   .metrics-cards {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .metrics-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .period-selector {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .period-selector button {
+    flex: 1;
   }
 }

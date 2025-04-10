@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import authService from '../../services/authService';
+import apiClient from '../../services/apiClient';
 import { AuthState, User } from '../../types';
 
 interface LoginCredentials {
@@ -8,7 +8,7 @@ interface LoginCredentials {
 }
 
 interface RegisterCredentials {
-  name: string;
+  username: string;
   email: string;
   password: string;
 }
@@ -23,32 +23,87 @@ export const login = createAsyncThunk<AuthResponse, LoginCredentials, { rejectVa
   'auth/login',
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      return await authService.login(email, password);
+      const response = await apiClient.auth.login(email, password);
+      const authResponse: AuthResponse = {
+        user: response.user,
+        token: response.token,
+        isAuthenticated: true
+      };
+      return authResponse;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Login failed');
+      return rejectWithValue(error.message || 'Login failed');
     }
   }
 );
 
 export const register = createAsyncThunk<AuthResponse, RegisterCredentials, { rejectValue: string }>(
   'auth/register',
-  async ({ name, email, password }, { rejectWithValue }) => {
+  async ({ username, email, password }, { rejectWithValue }) => {
     try {
-      return await authService.register(name, email, password);
+      const response = await apiClient.auth.register({ username, email, password });
+      const authResponse: AuthResponse = {
+        user: response.user,
+        token: response.token,
+        isAuthenticated: true
+      };
+      return authResponse;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Registration failed');
+      return rejectWithValue(error.message || 'Registration failed');
     }
   }
 );
 
 export const logout = createAsyncThunk('auth/logout', async () => {
-  await authService.logout();
+  localStorage.removeItem('token');
+  localStorage.removeItem('refreshToken');
 });
 
 export const checkAuthStatus = createAsyncThunk<AuthResponse>(
   'auth/check',
-  async () => {
-    return await authService.checkAuthStatus();
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        return { isAuthenticated: false, user: null } as AuthResponse;
+      }
+      
+      const user = await apiClient.auth.getUser();
+      return {
+        isAuthenticated: true,
+        user,
+        token
+      };
+    } catch (error) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      return rejectWithValue('Authentication check failed');
+    }
+  }
+);
+
+export const updateProfile = createAsyncThunk<User, Partial<User>, { rejectValue: string }>(
+  'auth/updateProfile',
+  async (userData, { rejectWithValue }) => {
+    try {
+      return await apiClient.auth.updateProfile(userData);
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Profile update failed');
+    }
+  }
+);
+
+export const changePassword = createAsyncThunk<
+  { success: boolean },
+  { currentPassword: string; newPassword: string },
+  { rejectValue: string }
+>(
+  'auth/changePassword',
+  async ({ currentPassword, newPassword }, { rejectWithValue }) => {
+    try {
+      return await apiClient.auth.changePassword(currentPassword, newPassword);
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Password change failed');
+    }
   }
 );
 
@@ -124,6 +179,33 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.user = null;
         state.token = null;
+      })
+      
+      // Update profile reducers
+      .addCase(updateProfile.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateProfile.fulfilled, (state, action: PayloadAction<User>) => {
+        state.isLoading = false;
+        state.user = action.payload;
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload || 'Profile update failed';
+      })
+      
+      // Change password reducers
+      .addCase(changePassword.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(changePassword.fulfilled, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(changePassword.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload || 'Password change failed';
       });
   },
 });
