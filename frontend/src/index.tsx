@@ -7,9 +7,11 @@ import App from './App';
 import store from './store';
 import reportWebVitals from './reportWebVitals';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+// 인증 체크 비활성화
+// import { checkAuthStatus } from './store/slices/authSlice';
+// store.dispatch(checkAuthStatus());
+
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
 root.render(
   <React.StrictMode>

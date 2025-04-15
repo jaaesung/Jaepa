@@ -8,13 +8,24 @@ import logging
 from typing import Dict, List, Any, Optional
 from pathlib import Path
 from contextlib import asynccontextmanager
+from datetime import timedelta
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Depends, status
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import BaseModel, ValidationError
+from sqlalchemy.orm import Session
 import uvicorn
+
+# 인증 및 데이터베이스 관련 모듈 가져오기
+import models
+import schemas
+import crud
+from database import engine, get_db
+from auth import authenticate_user, create_access_token, get_current_active_user, ACCESS_TOKEN_EXPIRE_MINUTES
 
 # 로깅 설정
 logging.basicConfig(
@@ -53,6 +64,9 @@ class SummaryRequest(BaseModel):
     """감성 요약 요청"""
     symbol: str
     days: int = 7
+
+# 데이터베이스 테이블 생성
+models.Base.metadata.create_all(bind=engine)
 
 # 생명 주기 관리자
 @asynccontextmanager
@@ -95,6 +109,15 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# CORS 미들웨어 추가
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 실제 프로덕션에서는 특정 도메인으로 제한해야 함
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # 정적 파일 마운트
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -121,9 +144,72 @@ async def api_root():
             "/api/analyze/text",
             "/api/analyze/news",
             "/api/analyze/correlation",
-            "/api/analyze/summary"
+            "/api/analyze/summary",
+            "/api/auth/token",
+            "/api/auth/register",
+            "/api/auth/me"
         ]
     }
+
+@app.post("/api/auth/token", response_model=schemas.Token)
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """액세스 토큰 발급"""
+    user = authenticate_user(db, form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.post("/api/auth/register", response_model=schemas.User)
+async def register_user(request: Request, user: schemas.UserCreate, db: Session = Depends(get_db)):
+    """사용자 등록"""
+    logger.info(f"사용자 등록 요청: {user}")
+    logger.info(f"요청 데이터 타입: {type(user)}")
+    logger.info(f"요청 데이터 필드: {user.__dict__ if hasattr(user, '__dict__') else 'No __dict__ attribute'}")
+
+    # 요청 데이터 로깅
+    try:
+        request_body = await request.json()
+        logger.info(f"원시 요청 데이터: {request_body}")
+    except Exception as e:
+        logger.error(f"요청 데이터 파싱 오류: {str(e)}")
+
+    try:
+        db_user_by_email = crud.get_user_by_email(db, email=user.email)
+        if db_user_by_email:
+            logger.error(f"이미 등록된 이메일: {user.email}")
+            raise HTTPException(status_code=400, detail="Email already registered")
+
+        db_user_by_username = crud.get_user_by_username(db, username=user.username)
+        if db_user_by_username:
+            logger.error(f"이미 등록된 사용자 이름: {user.username}")
+            raise HTTPException(status_code=400, detail="Username already registered")
+
+        new_user = crud.create_user(db=db, user=user)
+        logger.info(f"사용자 등록 성공: {new_user.username}")
+        return new_user
+    except ValidationError as ve:
+        logger.error(f"유효성 검사 오류: {str(ve)}")
+        raise HTTPException(status_code=422, detail=f"유효성 검사 오류: {str(ve)}")
+    except HTTPException as he:
+        logger.error(f"HTTP 예외: {str(he)}")
+        raise
+    except Exception as e:
+        logger.error(f"사용자 등록 오류: {str(e)}")
+        logger.exception(e)
+        raise HTTPException(status_code=500, detail=f"사용자 등록 오류: {str(e)}")
+
+@app.get("/api/auth/me", response_model=schemas.User)
+async def read_users_me(current_user: models.User = Depends(get_current_active_user)):
+    """현재 사용자 정보 조회"""
+    return current_user
 
 @app.post("/api/analyze/text")
 async def analyze_text(request: TextRequest):

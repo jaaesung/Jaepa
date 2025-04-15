@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../types';
 import {
-  fetchStockData,
   fetchMultipleStocks,
   fetchStockCorrelation,
   searchStocks,
 } from '../../store/slices/stockSlice';
 import { useAppDispatch } from '../../hooks';
-import { StockData, PeriodType } from '../../types';
+import { PeriodType } from '../../types';
 import './StockAnalysis.css';
 
 // 컴포넌트 불러오기
@@ -31,9 +30,7 @@ interface Watchlist {
 
 const StockAnalysis: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { stocks, selectedStock, correlationData, searchResults, isLoading, error } = useSelector(
-    (state: RootState) => state.stocks
-  );
+  const { stocks, searchResults, isLoading } = useSelector((state: RootState) => state.stocks);
 
   // 상태 관리
   const [searchQuery, setSearchQuery] = useState<string>('');

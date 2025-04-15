@@ -160,13 +160,13 @@ const CorrelationChart: React.FC<CorrelationChartProps> = ({
           />
           <Legend
             payload={[
-              { value: '주가', type: undefined, color: '#1f77b4' },
+              { value: '주가', type: 'line' as const, color: '#1f77b4' },
               {
                 value: '감성 점수',
-                type: undefined,
+                type: 'line' as const,
                 color: sentimentColor,
               },
-              ...(showVolume ? [{ value: '거래량', type: undefined, color: '#8884d8' }] : []),
+              ...(showVolume ? [{ value: '거래량', type: 'rect' as const, color: '#8884d8' }] : []),
             ]}
           />
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { login, clearError } from '../../store/slices/authSlice';
@@ -25,17 +25,7 @@ const Login: React.FC = () => {
 
   const { isAuthenticated, isLoading, error } = useSelector((state: RootState) => state.auth);
 
-  useEffect(() => {
-    // 이미 인증된 사용자는 대시보드로 리디렉션
-    if (isAuthenticated) {
-      navigate('/');
-    }
-
-    // 컴포넌트 언마운트 시 에러 초기화
-    return () => {
-      dispatch(clearError());
-    };
-  }, [isAuthenticated, navigate, dispatch]);
+  // 자동 리디렉션 제거
 
   const validateForm = (): boolean => {
     const errors: FormErrors = {};

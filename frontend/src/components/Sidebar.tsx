@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../types';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -30,6 +32,7 @@ interface ExpandedMenus {
  */
 const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
   const location = useLocation();
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const [expandedMenus, setExpandedMenus] = useState<ExpandedMenus>({
     newsAnalysis: false,
     stockAnalysis: false,
@@ -119,53 +122,54 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
 
       <nav className="sidebar-nav">
         <ul>
-          {menuItems.map((item) => (
-            <li key={item.id} className="nav-item">
-              {item.submenu ? (
-                <>
-                  <button
-                    className={`nav-link ${
-                      location.pathname.startsWith(item.path) ? 'active' : ''
-                    }`}
-                    onClick={() => toggleMenu(item.id)}
+          {/* 로그인 상태에 따라 메뉴 표시 */}
+          {menuItems
+            .filter(item => isAuthenticated || ['dashboard'].includes(item.id))
+            .map(item => (
+              <li key={item.id} className="nav-item">
+                {item.submenu ? (
+                  <>
+                    <button
+                      className={`nav-link ${
+                        location.pathname.startsWith(item.path) ? 'active' : ''
+                      }`}
+                      onClick={() => toggleMenu(item.id)}
+                    >
+                      <span className="menu-icon">{item.icon}</span>
+                      <span className="menu-text">{item.label}</span>
+                      <span className="submenu-indicator">
+                        {expandedMenus[item.id] ? '▼' : '▶'}
+                      </span>
+                    </button>
+                    {expandedMenus[item.id] && (
+                      <ul className="submenu">
+                        {item.submenu.map(subitem => (
+                          <li key={subitem.id}>
+                            <NavLink
+                              to={subitem.path}
+                              className={({ isActive }) =>
+                                `submenu-link ${isActive ? 'active' : ''}`
+                              }
+                            >
+                              {subitem.label}
+                            </NavLink>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                ) : (
+                  <NavLink
+                    to={item.path}
+                    className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                    end={item.exact}
                   >
                     <span className="menu-icon">{item.icon}</span>
                     <span className="menu-text">{item.label}</span>
-                    <span className="submenu-indicator">
-                      {expandedMenus[item.id] ? '▼' : '▶'}
-                    </span>
-                  </button>
-                  {expandedMenus[item.id] && (
-                    <ul className="submenu">
-                      {item.submenu.map((subitem) => (
-                        <li key={subitem.id}>
-                          <NavLink
-                            to={subitem.path}
-                            className={({ isActive }) =>
-                              `submenu-link ${isActive ? 'active' : ''}`
-                            }
-                          >
-                            {subitem.label}
-                          </NavLink>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </>
-              ) : (
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) =>
-                    `nav-link ${isActive ? 'active' : ''}`
-                  }
-                  end={item.exact}
-                >
-                  <span className="menu-icon">{item.icon}</span>
-                  <span className="menu-text">{item.label}</span>
-                </NavLink>
-              )}
-            </li>
-          ))}
+                  </NavLink>
+                )}
+              </li>
+            ))}
         </ul>
       </nav>
 

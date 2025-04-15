@@ -21,6 +21,7 @@ type PeriodType = '1d' | '1w' | '1m' | '3m';
 const Dashboard: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
+  // 인증 체크 제거 - 로그인하지 않은 사용자도 대시보드를 볼 수 있도록 설정
   const { articles: newsItems, isLoading: newsLoading } = useSelector(
     (state: RootState) => state.news
   );

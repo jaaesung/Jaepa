@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { register } from '../../store/slices/authSlice';
@@ -9,7 +9,14 @@ import './Register.css';
 const Register: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { isLoading, error } = useSelector((state: RootState) => state.auth);
+  const { isLoading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  // 이미 인증된 사용자는 대시보드로 리디렉션
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -85,12 +92,19 @@ const Register: React.FC = () => {
     e.preventDefault();
 
     if (validateForm()) {
+      // 회원가입 요청 데이터 디버깅
+      console.log('회원가입 요청 데이터:', {
+        username: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
+
       dispatch(
         register({
           username: formData.name,
           email: formData.email,
           password: formData.password,
-        } as any)
+        })
       );
     }
   };

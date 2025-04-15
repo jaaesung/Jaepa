@@ -17,7 +17,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
   const { theme } = useSelector((state: RootState) => state.ui);
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -78,25 +78,41 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar }) => {
           {theme === 'light' ? '🌙' : '☀️'}
         </button>
 
-        <div className="notification-icon">
-          🔔
-          <span className="notification-badge">3</span>
-        </div>
+        <button className="dashboard-btn" onClick={() => navigate('/dashboard')}>
+          대시보드
+        </button>
 
-        <div className="profile-dropdown">
-          <button className="profile-btn" onClick={toggleProfileMenu} aria-expanded={isProfileOpen}>
-            <div className="avatar">{user?.username?.charAt(0).toUpperCase() || 'U'}</div>
-            <span className="username">{user?.username || 'User'}</span>
-          </button>
-
-          {isProfileOpen && (
-            <div className="dropdown-menu">
-              <button onClick={() => navigate('/profile')}>프로필 관리</button>
-              <button onClick={() => navigate('/settings')}>설정</button>
-              <button onClick={handleLogout}>로그아웃</button>
+        {isAuthenticated ? (
+          <>
+            <div className="notification-icon">
+              🔔
+              <span className="notification-badge">3</span>
             </div>
-          )}
-        </div>
+
+            <div className="profile-dropdown">
+              <button
+                className="profile-btn"
+                onClick={toggleProfileMenu}
+                aria-expanded={isProfileOpen}
+              >
+                <div className="avatar">{user?.username?.charAt(0).toUpperCase() || 'U'}</div>
+                <span className="username">{user?.username || 'User'}</span>
+              </button>
+
+              {isProfileOpen && (
+                <div className="dropdown-menu">
+                  <button onClick={() => navigate('/dashboard/profile')}>프로필 관리</button>
+                  <button onClick={() => navigate('/dashboard/settings')}>설정</button>
+                  <button onClick={handleLogout}>로그아웃</button>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          <button className="login-btn" onClick={() => navigate('/login')}>
+            로그인
+          </button>
+        )}
       </div>
     </header>
   );
