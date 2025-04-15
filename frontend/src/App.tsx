@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import './App.css';
 import { RootState } from './types';
+import { useAppDispatch } from './hooks';
 
 // 페이지 컴포넌트 가져오기
 import Dashboard from './pages/Dashboard';
@@ -30,7 +31,7 @@ interface ProtectedRouteProps {
 }
 
 const App: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { isAuthenticated, isLoading } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
@@ -55,20 +56,23 @@ const App: React.FC = () => {
         {/* 공개 경로 */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        
+
         {/* 보호된 경로 */}
-        <Route path="/" element={
-          <ProtectedRoute>
-            <Layout />
-          </ProtectedRoute>
-        }>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Layout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Dashboard />} />
           <Route path="news-analysis" element={<NewsAnalysis />} />
           <Route path="stock-analysis" element={<StockAnalysis />} />
           <Route path="settings" element={<Settings />} />
           <Route path="profile" element={<Profile />} />
         </Route>
-        
+
         {/* 404 경로 */}
         <Route path="*" element={<NotFound />} />
       </Routes>

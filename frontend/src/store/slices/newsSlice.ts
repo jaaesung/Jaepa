@@ -28,7 +28,7 @@ interface FetchNewsKeywordsParams {
 }
 
 interface KeywordData {
-  text: string; 
+  text: string;
   value: number;
   sentiment: number;
 }
@@ -51,30 +51,23 @@ export const fetchNews = createAsyncThunk<
   PaginatedNewsResponse,
   FetchNewsParams,
   { rejectValue: string }
->(
-  'news/fetchNews',
-  async ({ page = 1, limit = 10, filters = {} }, { rejectWithValue }) => {
-    try {
-      const params = {
-        page,
-        limit,
-        ...filters
-      };
-      
-      const response = await apiClient.news.getAll(params);
-      return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to fetch news');
-    }
+>('news/fetchNews', async ({ page = 1, limit = 10, filters = {} }, { rejectWithValue }) => {
+  try {
+    const params = {
+      page,
+      limit,
+      ...filters,
+    };
+
+    const response = await apiClient.news.getAll(params);
+    return response;
+  } catch (error: any) {
+    return rejectWithValue(error.message || 'Failed to fetch news');
   }
-);
+});
 
 // 특정 뉴스 항목 가져오기
-export const fetchNewsItem = createAsyncThunk<
-  NewsArticle,
-  string,
-  { rejectValue: string }
->(
+export const fetchNewsItem = createAsyncThunk<NewsArticle, string, { rejectValue: string }>(
   'news/fetchNewsItem',
   async (newsId, { rejectWithValue }) => {
     try {
@@ -91,34 +84,28 @@ export const fetchNewsKeywords = createAsyncThunk<
   KeywordData[],
   FetchNewsKeywordsParams,
   { rejectValue: string }
->(
-  'news/fetchKeywords',
-  async (params, { rejectWithValue }) => {
-    try {
-      const response = await apiClient.news.getPopularKeywords(params);
-      return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to fetch keywords');
-    }
+>('news/fetchKeywords', async (params, { rejectWithValue }) => {
+  try {
+    const response = await apiClient.news.getPopularKeywords(params);
+    return response;
+  } catch (error: any) {
+    return rejectWithValue(error.message || 'Failed to fetch keywords');
   }
-);
+});
 
 // 뉴스 감성 트렌드 가져오기
 export const fetchNewsSentimentTrend = createAsyncThunk<
   SentimentTrendData[],
   FetchNewsSentimentTrendParams,
   { rejectValue: string }
->(
-  'news/fetchSentimentTrend',
-  async (params, { rejectWithValue }) => {
-    try {
-      const response = await apiClient.news.getSentimentTrend(params);
-      return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Failed to fetch sentiment trend');
-    }
+>('news/fetchSentimentTrend', async (params, { rejectWithValue }) => {
+  try {
+    const response = await apiClient.news.getSentimentTrend(params);
+    return response;
+  } catch (error: any) {
+    return rejectWithValue(error.message || 'Failed to fetch sentiment trend');
   }
-);
+});
 
 interface ExtendedNewsState extends NewsState {
   selectedArticle: NewsArticle | null;
@@ -134,6 +121,7 @@ interface ExtendedNewsState extends NewsState {
 
 const initialState: ExtendedNewsState = {
   articles: [],
+  items: [],
   selectedArticle: null,
   totalItems: 0,
   currentPage: 1,
@@ -151,20 +139,20 @@ const newsSlice = createSlice({
   name: 'news',
   initialState,
   reducers: {
-    clearNewsError: (state) => {
+    clearNewsError: state => {
       state.error = null;
     },
     setSelectedArticle: (state, action: PayloadAction<NewsArticle | null>) => {
       state.selectedArticle = action.payload;
     },
-    clearSelectedArticle: (state) => {
+    clearSelectedArticle: state => {
       state.selectedArticle = null;
-    }
+    },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     builder
       // Fetch news reducers
-      .addCase(fetchNews.pending, (state) => {
+      .addCase(fetchNews.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -178,9 +166,9 @@ const newsSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload ?? 'An unknown error occurred';
       })
-      
+
       // Fetch news item reducers
-      .addCase(fetchNewsItem.pending, (state) => {
+      .addCase(fetchNewsItem.pending, state => {
         state.isLoading = true;
         state.error = null;
       })
@@ -192,9 +180,9 @@ const newsSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload ?? 'An unknown error occurred';
       })
-      
+
       // Fetch keywords reducers
-      .addCase(fetchNewsKeywords.pending, (state) => {
+      .addCase(fetchNewsKeywords.pending, state => {
         state.keywordsLoading = true;
         state.keywordsError = null;
       })
@@ -206,16 +194,19 @@ const newsSlice = createSlice({
         state.keywordsLoading = false;
         state.keywordsError = action.payload ?? 'An unknown error occurred';
       })
-      
+
       // Fetch sentiment trend reducers
-      .addCase(fetchNewsSentimentTrend.pending, (state) => {
+      .addCase(fetchNewsSentimentTrend.pending, state => {
         state.trendLoading = true;
         state.trendError = null;
       })
-      .addCase(fetchNewsSentimentTrend.fulfilled, (state, action: PayloadAction<SentimentTrendData[]>) => {
-        state.trendLoading = false;
-        state.sentimentTrend = action.payload;
-      })
+      .addCase(
+        fetchNewsSentimentTrend.fulfilled,
+        (state, action: PayloadAction<SentimentTrendData[]>) => {
+          state.trendLoading = false;
+          state.sentimentTrend = action.payload;
+        }
+      )
       .addCase(fetchNewsSentimentTrend.rejected, (state, action) => {
         state.trendLoading = false;
         state.trendError = action.payload ?? 'An unknown error occurred';

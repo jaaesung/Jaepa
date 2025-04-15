@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Checkbox, Divider, Typography, Space } from 'antd';
 import { getNewsSources } from '../../services/api';
-
-const { Title } = Typography;
 
 interface NewsSource {
   id: string;
@@ -15,9 +12,9 @@ interface NewsSourceFilterProps {
   defaultSelected?: string[];
 }
 
-const NewsSourceFilter: React.FC<NewsSourceFilterProps> = ({ 
-  onChange, 
-  defaultSelected = ['traditional', 'enhanced', 'gdelt'] 
+const NewsSourceFilter: React.FC<NewsSourceFilterProps> = ({
+  onChange,
+  defaultSelected = ['traditional', 'enhanced', 'gdelt'],
 }) => {
   const [sources, setSources] = useState<NewsSource[]>([]);
   const [selectedSources, setSelectedSources] = useState<string[]>(defaultSelected);
@@ -41,13 +38,13 @@ const NewsSourceFilter: React.FC<NewsSourceFilterProps> = ({
 
   const handleSourceChange = (sourceId: string, checked: boolean) => {
     let newSelectedSources: string[];
-    
+
     if (checked) {
       newSelectedSources = [...selectedSources, sourceId];
     } else {
       newSelectedSources = selectedSources.filter(id => id !== sourceId);
     }
-    
+
     setSelectedSources(newSelectedSources);
     onChange(newSelectedSources);
   };
@@ -65,38 +62,53 @@ const NewsSourceFilter: React.FC<NewsSourceFilterProps> = ({
 
   return (
     <div className="news-source-filter">
-      <Title level={5}>뉴스 소스</Title>
-      <Divider style={{ margin: '12px 0' }} />
-      
+      <h5 style={{ fontSize: '16px', fontWeight: 'bold', margin: '0 0 12px 0' }}>뉴스 소스</h5>
+      <hr style={{ margin: '12px 0', border: 'none', borderTop: '1px solid #f0f0f0' }} />
+
       <div style={{ marginBottom: 8 }}>
-        <Checkbox
-          checked={selectedSources.length === sources.length && sources.length > 0}
-          indeterminate={selectedSources.length > 0 && selectedSources.length < sources.length}
-          onChange={(e) => handleSelectAll(e.target.checked)}
-          disabled={loading}
+        <label
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            cursor: loading ? 'not-allowed' : 'pointer',
+          }}
         >
+          <input
+            type="checkbox"
+            checked={selectedSources.length === sources.length && sources.length > 0}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSelectAll(e.target.checked)}
+            disabled={loading}
+            style={{ marginRight: '8px' }}
+          />
           전체 선택
-        </Checkbox>
+        </label>
       </div>
-      
-      <Space direction="vertical" style={{ width: '100%' }}>
+
+      <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '8px' }}>
         {loading ? (
           <div>로딩 중...</div>
         ) : (
           sources.map(source => (
-            <Checkbox
+            <label
               key={source.id}
-              checked={selectedSources.includes(source.id)}
-              onChange={(e) => handleSourceChange(source.id, e.target.checked)}
+              style={{ display: 'flex', alignItems: 'flex-start', cursor: 'pointer' }}
             >
+              <input
+                type="checkbox"
+                checked={selectedSources.includes(source.id)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleSourceChange(source.id, e.target.checked)
+                }
+                style={{ marginRight: '8px', marginTop: '3px' }}
+              />
               <div>
                 <div>{source.name}</div>
                 <div style={{ fontSize: '12px', color: '#888' }}>{source.description}</div>
               </div>
-            </Checkbox>
+            </label>
           ))
         )}
-      </Space>
+      </div>
     </div>
   );
 };

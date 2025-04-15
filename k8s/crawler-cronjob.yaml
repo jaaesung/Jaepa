@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: news-crawler
+  namespace: jaepa
+spec:
+  schedule: "0 */6 * * *"  # 6시간마다 실행
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: crawler
+            image: jaepa-backend:latest
+            imagePullPolicy: IfNotPresent
+            command: ["python", "-m", "crawling.news_crawler", "run"]
+            env:
+            - name: MONGODB_URI
+              value: "mongodb://$(MONGO_USERNAME):$(MONGO_PASSWORD)@mongodb:27017/jaepa"
+            - name: MONGO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: jaepa-secrets
+                  key: MONGO_USERNAME
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: jaepa-secrets
+                  key: MONGO_PASSWORD
+            - name: POLYGON_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jaepa-secrets
+                  key: POLYGON_API_KEY
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: jaepa-config
+                  key: ENVIRONMENT
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: jaepa-config
+                  key: LOG_LEVEL
+            - name: MONGO_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: jaepa-config
+                  key: MONGO_DB_NAME
+            resources:
+              requests:
+                memory: "256Mi"
+                cpu: "200m"
+              limits:
+                memory: "512Mi"
+                cpu: "500m"
+          restartPolicy: OnFailure

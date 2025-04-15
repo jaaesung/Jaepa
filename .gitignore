@@ -82,3 +82,24 @@ __pycache__/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+
+# 테스트 결과 및 리포트
+playwright-report/
+test-results/
+
+# 개발 환경 설정
+.husky/
+.prettierrc
+jest.config.js
+playwright.config.ts
+setupTests.ts
+
+# 이미지 및 미디어 파일
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.mp4
+*.webm
+*.mov

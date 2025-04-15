@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '../../types';
 import { fetchNews } from '../../store/slices/newsSlice';
+import { useAppDispatch } from '../../hooks';
 import './NewsAnalysis.css';
 
 // 컴포넌트 불러오기
@@ -19,9 +20,9 @@ interface FilterOptions {
 }
 
 const NewsAnalysis: React.FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { articles, isLoading, error } = useSelector((state: RootState) => state.news);
-  
+
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
   const [view, setView] = useState<'grid' | 'list'>('list');
   const [filters, setFilters] = useState<FilterOptions>({
@@ -33,16 +34,16 @@ const NewsAnalysis: React.FC = () => {
   });
   const [sortBy, setSortBy] = useState<string>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  
+
   // 페이지네이션
   const [currentPage, setCurrentPage] = useState(1);
   const articlesPerPage = 10;
-  
+
   useEffect(() => {
     // 뉴스 데이터 가져오기
     dispatch(fetchNews({ page: currentPage, limit: articlesPerPage }));
   }, [dispatch, currentPage]);
-  
+
   // 필터 변경 핸들러
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -51,23 +52,25 @@ const NewsAnalysis: React.FC = () => {
       [name]: value,
     });
   };
-  
+
   // 필터 적용 핸들러
   const applyFilters = () => {
-    dispatch(fetchNews({ 
-      page: 1, 
-      limit: articlesPerPage,
-      filters: {
-        startDate: filters.startDate,
-        endDate: filters.endDate,
-        source: filters.source,
-        sentiment: filters.sentiment,
-        keyword: filters.keyword
-      }
-    }));
+    dispatch(
+      fetchNews({
+        page: 1,
+        limit: articlesPerPage,
+        filters: {
+          startDate: filters.startDate,
+          endDate: filters.endDate,
+          source: filters.source,
+          sentiment: filters.sentiment,
+          keyword: filters.keyword,
+        },
+      })
+    );
     setCurrentPage(1); // 첫 페이지로 리셋
   };
-  
+
   // 필터 초기화 핸들러
   const resetFilters = () => {
     setFilters({
@@ -80,32 +83,32 @@ const NewsAnalysis: React.FC = () => {
     dispatch(fetchNews({ page: 1, limit: articlesPerPage }));
     setCurrentPage(1);
   };
-  
+
   // 정렬 변경 핸들러
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortBy(e.target.value);
   };
-  
+
   // 정렬 순서 변경 핸들러
   const toggleSortOrder = () => {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
   };
-  
+
   // 페이지 변경 핸들러
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
-  
+
   // 뉴스 항목 선택 핸들러
   const handleSelectArticle = (article: NewsArticle) => {
     setSelectedArticle(article);
   };
-  
+
   // 선택 해제 핸들러
   const handleCloseDetail = () => {
     setSelectedArticle(null);
   };
-  
+
   // 샘플 감성 데이터
   const sampleSentimentData = [
     { date: '2025-04-01', positive: 0.45, neutral: 0.35, negative: 0.2 },
@@ -116,7 +119,7 @@ const NewsAnalysis: React.FC = () => {
     { date: '2025-04-06', positive: 0.47, neutral: 0.33, negative: 0.2 },
     { date: '2025-04-07', positive: 0.5, neutral: 0.3, negative: 0.2 },
   ];
-  
+
   // 샘플 키워드 데이터
   const sampleKeywordData = [
     { text: 'AI', value: 100, sentiment: 0.8 },
@@ -135,7 +138,7 @@ const NewsAnalysis: React.FC = () => {
     { text: '대체에너지', value: 34, sentiment: 0.3 },
     { text: '지속가능성', value: 33, sentiment: 0.4 },
   ];
-  
+
   // 샘플 뉴스 소스 목록
   const sampleNewsSources = [
     '한국경제',
@@ -148,16 +151,17 @@ const NewsAnalysis: React.FC = () => {
     'FT',
     '니혼게이자이',
   ];
-  
+
   return (
     <div className="news-analysis-container">
       <div className="news-analysis-header">
         <h1>뉴스 분석</h1>
         <p className="description">
-          최신 뉴스 기사와 감성 분석 결과를 확인하세요. 키워드 및 감성 트렌드를 통해 시장 분위기를 파악할 수 있습니다.
+          최신 뉴스 기사와 감성 분석 결과를 확인하세요. 키워드 및 감성 트렌드를 통해 시장 분위기를
+          파악할 수 있습니다.
         </p>
       </div>
-      
+
       <div className="news-analysis-content">
         <div className="news-filters-container">
           <div className="filters-panel">
@@ -180,7 +184,7 @@ const NewsAnalysis: React.FC = () => {
                 </button>
               </div>
             </div>
-            
+
             <div className="filter-form">
               <div className="filter-group">
                 <label>날짜 범위</label>
@@ -202,37 +206,29 @@ const NewsAnalysis: React.FC = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="filter-group">
                 <label>뉴스 소스</label>
-                <select
-                  name="source"
-                  value={filters.source}
-                  onChange={handleFilterChange}
-                >
+                <select name="source" value={filters.source} onChange={handleFilterChange}>
                   <option value="">전체</option>
-                  {sampleNewsSources.map((source) => (
+                  {sampleNewsSources.map(source => (
                     <option key={source} value={source}>
                       {source}
                     </option>
                   ))}
                 </select>
               </div>
-              
+
               <div className="filter-group">
                 <label>감성 분류</label>
-                <select
-                  name="sentiment"
-                  value={filters.sentiment}
-                  onChange={handleFilterChange}
-                >
+                <select name="sentiment" value={filters.sentiment} onChange={handleFilterChange}>
                   <option value="">전체</option>
                   <option value="positive">긍정적</option>
                   <option value="neutral">중립적</option>
                   <option value="negative">부정적</option>
                 </select>
               </div>
-              
+
               <div className="filter-group">
                 <label>키워드 검색</label>
                 <input
@@ -244,22 +240,16 @@ const NewsAnalysis: React.FC = () => {
                 />
               </div>
             </div>
-            
+
             <div className="filter-actions">
-              <button
-                className="filter-button apply"
-                onClick={applyFilters}
-              >
+              <button className="filter-button apply" onClick={applyFilters}>
                 필터 적용
               </button>
-              <button
-                className="filter-button reset"
-                onClick={resetFilters}
-              >
+              <button className="filter-button reset" onClick={resetFilters}>
                 초기화
               </button>
             </div>
-            
+
             <div className="sort-options">
               <label>정렬 기준:</label>
               <select value={sortBy} onChange={handleSortChange}>
@@ -277,62 +267,66 @@ const NewsAnalysis: React.FC = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="news-content-container">
           {selectedArticle ? (
             <div className="news-detail-view">
-              <button
-                className="close-detail-button"
-                onClick={handleCloseDetail}
-                aria-label="닫기"
-              >
+              <button className="close-detail-button" onClick={handleCloseDetail} aria-label="닫기">
                 ← 목록으로 돌아가기
               </button>
-              
+
               <div className="news-detail-header">
                 <h2>{selectedArticle.title}</h2>
                 <div className="news-meta">
                   <span className="news-source">{selectedArticle.source}</span>
-                  <span className="news-date">{new Date(selectedArticle.publishedDate).toLocaleDateString('ko-KR')}</span>
+                  <span className="news-date">
+                    {new Date(selectedArticle.publishedDate).toLocaleDateString('ko-KR')}
+                  </span>
                 </div>
               </div>
-              
+
               <div className="news-detail-sentiment">
                 <h3>감성 분석 결과</h3>
                 <div className="sentiment-score-bars">
                   <div className="sentiment-bar">
                     <span className="label">긍정</span>
                     <div className="bar-container">
-                      <div 
-                        className="bar positive" 
+                      <div
+                        className="bar positive"
                         style={{ width: `${(selectedArticle.sentiment?.positive || 0) * 100}%` }}
                       ></div>
-                      <span className="value">{((selectedArticle.sentiment?.positive || 0) * 100).toFixed(1)}%</span>
+                      <span className="value">
+                        {((selectedArticle.sentiment?.positive || 0) * 100).toFixed(1)}%
+                      </span>
                     </div>
                   </div>
                   <div className="sentiment-bar">
                     <span className="label">중립</span>
                     <div className="bar-container">
-                      <div 
-                        className="bar neutral" 
+                      <div
+                        className="bar neutral"
                         style={{ width: `${(selectedArticle.sentiment?.neutral || 0) * 100}%` }}
                       ></div>
-                      <span className="value">{((selectedArticle.sentiment?.neutral || 0) * 100).toFixed(1)}%</span>
+                      <span className="value">
+                        {((selectedArticle.sentiment?.neutral || 0) * 100).toFixed(1)}%
+                      </span>
                     </div>
                   </div>
                   <div className="sentiment-bar">
                     <span className="label">부정</span>
                     <div className="bar-container">
-                      <div 
-                        className="bar negative" 
+                      <div
+                        className="bar negative"
                         style={{ width: `${(selectedArticle.sentiment?.negative || 0) * 100}%` }}
                       ></div>
-                      <span className="value">{((selectedArticle.sentiment?.negative || 0) * 100).toFixed(1)}%</span>
+                      <span className="value">
+                        {((selectedArticle.sentiment?.negative || 0) * 100).toFixed(1)}%
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
-              
+
               <div className="news-detail-keywords">
                 <h3>주요 키워드</h3>
                 <div className="keywords-container">
@@ -343,7 +337,7 @@ const NewsAnalysis: React.FC = () => {
                   ))}
                 </div>
               </div>
-              
+
               <div className="news-detail-content">
                 <h3>뉴스 본문</h3>
                 <div className="news-content">
@@ -362,12 +356,12 @@ const NewsAnalysis: React.FC = () => {
                 </div>
               ) : error ? (
                 <div className="error-container">
-                  <p className="error-message">
-                    데이터를 불러오는 중 오류가 발생했습니다.
-                  </p>
-                  <button 
+                  <p className="error-message">데이터를 불러오는 중 오류가 발생했습니다.</p>
+                  <button
                     className="retry-button"
-                    onClick={() => dispatch(fetchNews({ page: currentPage, limit: articlesPerPage }))}
+                    onClick={() =>
+                      dispatch(fetchNews({ page: currentPage, limit: articlesPerPage }))
+                    }
                   >
                     다시 시도
                   </button>
@@ -377,10 +371,7 @@ const NewsAnalysis: React.FC = () => {
                   {articles.length > 0 ? (
                     articles.map(article => (
                       <div key={article.id} className="news-item-wrapper">
-                        <NewsCard
-                          article={article}
-                          onSelect={handleSelectArticle}
-                        />
+                        <NewsCard article={article} onSelect={handleSelectArticle} />
                       </div>
                     ))
                   ) : (
@@ -391,7 +382,7 @@ const NewsAnalysis: React.FC = () => {
                   )}
                 </div>
               )}
-              
+
               {!isLoading && !error && articles.length > 0 && (
                 <div className="pagination">
                   <button
@@ -413,24 +404,24 @@ const NewsAnalysis: React.FC = () => {
             </>
           )}
         </div>
-        
+
         <div className="news-analysis-sidebar">
           <div className="sidebar-section sentiment-trend">
             <h3>감성 트렌드</h3>
-            <SentimentChart 
+            <SentimentChart
               data={sampleSentimentData.map(item => ({
                 symbol: item.date.substring(5), // 월-일 형식으로 표시
                 positive: item.positive,
                 neutral: item.neutral,
-                negative: item.negative
+                negative: item.negative,
               }))}
               height={250}
             />
           </div>
-          
+
           <div className="sidebar-section keywords-cloud">
             <h3>인기 키워드</h3>
-            <KeywordCloud 
+            <KeywordCloud
               data={sampleKeywordData}
               width={300}
               height={300}
@@ -438,7 +429,7 @@ const NewsAnalysis: React.FC = () => {
               minFontSize={12}
             />
           </div>
-          
+
           <div className="sidebar-section summary-stats">
             <h3>요약 통계</h3>
             <div className="stats-grid">
