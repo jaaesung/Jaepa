@@ -1,5 +1,6 @@
 import api from './api';
 import { NewsArticle, StockData, User } from '../types';
+import logger from '../utils/logger';
 
 // API 엔드포인트 타입
 type Endpoint = 'news' | 'stocks' | 'auth' | 'analysis';
@@ -32,44 +33,70 @@ class ApiClient {
   async get<T>(
     endpoint: Endpoint,
     path: string = '',
-    params: Record<string, any> = {}
+    params: Record<string, unknown> = {}
   ): Promise<T> {
     try {
       const url = `/${endpoint}${path ? `/${path}` : ''}`;
       const response = await api.get<ApiResponse<T>>(url, { params });
       return response.data.data;
-    } catch (error: any) {
-      console.error('API GET 요청 오류:', error);
+    } catch (error) {
+      logger.error('API GET 요청 오류:', error);
+      const errorResponse = error as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
       throw new Error(
-        error.response?.data?.message || error.message || '요청을 처리하는 중 오류가 발생했습니다.'
+        errorResponse.response?.data?.message ||
+          errorResponse.message ||
+          '요청을 처리하는 중 오류가 발생했습니다.'
       );
     }
   }
 
   // POST 요청
-  async post<T>(endpoint: Endpoint, path: string = '', data: Record<string, any> = {}): Promise<T> {
+  async post<T>(
+    endpoint: Endpoint,
+    path: string = '',
+    data: Record<string, unknown> = {}
+  ): Promise<T> {
     try {
       const url = `/${endpoint}${path ? `/${path}` : ''}`;
       const response = await api.post<ApiResponse<T>>(url, data);
       return response.data.data;
-    } catch (error: any) {
-      console.error('API POST 요청 오류:', error);
+    } catch (error) {
+      const errorResponse = error as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
+      logger.error('API POST 요청 오류:', error);
       throw new Error(
-        error.response?.data?.message || error.message || '요청을 처리하는 중 오류가 발생했습니다.'
+        errorResponse.response?.data?.message ||
+          errorResponse.message ||
+          '요청을 처리하는 중 오류가 발생했습니다.'
       );
     }
   }
 
   // PUT 요청
-  async put<T>(endpoint: Endpoint, path: string = '', data: Record<string, any> = {}): Promise<T> {
+  async put<T>(
+    endpoint: Endpoint,
+    path: string = '',
+    data: Record<string, unknown> = {}
+  ): Promise<T> {
     try {
       const url = `/${endpoint}${path ? `/${path}` : ''}`;
       const response = await api.put<ApiResponse<T>>(url, data);
       return response.data.data;
-    } catch (error: any) {
-      console.error('API PUT 요청 오류:', error);
+    } catch (error) {
+      const errorResponse = error as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
+      logger.error('API PUT 요청 오류:', error);
       throw new Error(
-        error.response?.data?.message || error.message || '요청을 처리하는 중 오류가 발생했습니다.'
+        errorResponse.response?.data?.message ||
+          errorResponse.message ||
+          '요청을 처리하는 중 오류가 발생했습니다.'
       );
     }
   }
@@ -80,10 +107,16 @@ class ApiClient {
       const url = `/${endpoint}${path ? `/${path}` : ''}`;
       const response = await api.delete<ApiResponse<T>>(url);
       return response.data.data;
-    } catch (error: any) {
-      console.error('API DELETE 요청 오류:', error);
+    } catch (error) {
+      const errorResponse = error as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
+      logger.error('API DELETE 요청 오류:', error);
       throw new Error(
-        error.response?.data?.message || error.message || '요청을 처리하는 중 오류가 발생했습니다.'
+        errorResponse.response?.data?.message ||
+          errorResponse.message ||
+          '요청을 처리하는 중 오류가 발생했습니다.'
       );
     }
   }
@@ -184,35 +217,46 @@ class ApiClient {
     // 로그인
     login: async (username: string, password: string): Promise<{ token: string; user: User }> => {
       try {
-        console.log('로그인 요청 데이터:', { username, password });
+        logger.log('로그인 요청 데이터:', { username, password });
 
         // OAuth2 형식으로 로그인 요청
-        const formData = new FormData();
-        formData.append('username', username); // API는 username으로 받음
-        formData.append('password', password);
+        const data = new URLSearchParams();
+        data.append('username', username); // API는 username으로 받음
+        data.append('password', password);
 
-        const response = await api.post('/api/auth/token', formData);
-        console.log('로그인 응답:', response.data);
+        const response = await api.post('/auth/token', data, {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        });
+        logger.log('로그인 응답:', response.data);
 
         // 토큰 저장
         const token = response.data.access_token;
         localStorage.setItem('token', token);
 
         // 사용자 정보 가져오기
-        const userResponse = await api.get('/api/auth/me', {
+        const userResponse = await api.get('/auth/me', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log('사용자 정보 응답:', userResponse.data);
+        logger.log('사용자 정보 응답:', userResponse.data);
 
         return {
           token,
           user: userResponse.data,
         };
-      } catch (error: any) {
-        console.error('로그인 오류:', error);
-        console.error('오류 응답:', error.response?.data);
+      } catch (error) {
+        const errorResponse = error as {
+          response?: { data?: { detail?: string } };
+          message?: string;
+        };
+        logger.error('로그인 오류:', error);
+        const errorData = error as { response?: { data?: any } };
+        logger.error('오류 응답:', errorData.response?.data);
         throw new Error(
-          error.response?.data?.detail || error.message || '로그인 중 오류가 발생했습니다.'
+          errorResponse.response?.data?.detail ||
+            errorResponse.message ||
+            '로그인 중 오류가 발생했습니다.'
         );
       }
     },
@@ -224,7 +268,7 @@ class ApiClient {
       password: string;
     }): Promise<{ token: string; user: User }> => {
       try {
-        console.log('회원가입 요청 데이터:', userData);
+        logger.log('회원가입 요청 데이터:', userData);
 
         // 회원가입 요청 (username을 사용자 이름으로 사용)
         const registerData = {
@@ -233,19 +277,26 @@ class ApiClient {
           password: userData.password,
         };
 
-        console.log('회원가입 요청 데이터 (수정됨):', registerData);
+        logger.log('회원가입 요청 데이터 (수정됨):', registerData);
 
         // 회원가입 요청
-        const registerResponse = await api.post('/api/auth/register', registerData);
-        console.log('회원가입 응답:', registerResponse.data);
+        const registerResponse = await api.post('/auth/register', registerData);
+        logger.log('회원가입 응답:', registerResponse.data);
 
         // 회원가입 후 바로 로그인 (username을 사용자 이름으로 사용)
         return this.auth.login(userData.username, userData.password);
-      } catch (error: any) {
-        console.error('회원가입 오류:', error);
-        console.error('오류 응답:', error.response?.data);
+      } catch (error) {
+        const errorResponse = error as {
+          response?: { data?: { detail?: string } };
+          message?: string;
+        };
+        logger.error('회원가입 오류:', error);
+        const errorData = error as { response?: { data?: any } };
+        logger.error('오류 응답:', errorData.response?.data);
         throw new Error(
-          error.response?.data?.detail || error.message || '회원가입 중 오류가 발생했습니다.'
+          errorResponse.response?.data?.detail ||
+            errorResponse.message ||
+            '회원가입 중 오류가 발생했습니다.'
         );
       }
     },
@@ -258,21 +309,26 @@ class ApiClient {
           throw new Error('인증 토큰이 없습니다.');
         }
 
-        const response = await api.get('/api/auth/me', {
+        const response = await api.get('/auth/me', {
           headers: { Authorization: `Bearer ${token}` },
         });
         return response.data;
-      } catch (error: any) {
-        console.error('사용자 정보 가져오기 오류:', error);
+      } catch (error) {
+        const errorResponse = error as {
+          response?: { data?: { detail?: string } };
+          message?: string;
+        };
+        logger.error('사용자 정보 가져오기 오류:', error);
         throw new Error(
-          error.response?.data?.detail ||
-            error.message ||
+          errorResponse.response?.data?.detail ||
+            errorResponse.message ||
             '사용자 정보를 가져오는 중 오류가 발생했습니다.'
         );
       }
     },
 
     // 비밀번호 변경
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     changePassword: async (
       currentPassword: string,
       newPassword: string

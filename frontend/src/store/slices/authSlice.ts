@@ -30,8 +30,9 @@ export const login = createAsyncThunk<AuthResponse, LoginCredentials, { rejectVa
         isAuthenticated: true,
       };
       return authResponse;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Login failed');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -53,8 +54,9 @@ export const register = createAsyncThunk<
       isAuthenticated: true,
     };
     return authResponse;
-  } catch (error: any) {
-    return rejectWithValue(error.message || 'Registration failed');
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Registration failed';
+    return rejectWithValue(errorMessage);
   }
 });
 
@@ -63,14 +65,15 @@ export const logout = createAsyncThunk('auth/logout', async () => {
   localStorage.removeItem('refreshToken');
 });
 
-export const checkAuthStatus = createAsyncThunk<AuthResponse>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const checkAuthStatus = createAsyncThunk<any, void, { rejectValue: string }>(
   'auth/check',
-  async (_, { rejectWithValue }) => {
+  async _ => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         // 토큰이 없으면 인증되지 않은 상태로 처리
-        return { isAuthenticated: false, user: null as any } as AuthResponse;
+        return { isAuthenticated: false, user: null };
       }
 
       try {
@@ -86,14 +89,14 @@ export const checkAuthStatus = createAsyncThunk<AuthResponse>(
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
         // 인증되지 않은 상태로 처리 (오류로 처리하지 않음)
-        return { isAuthenticated: false, user: null as any } as AuthResponse;
+        return { isAuthenticated: false, user: null };
       }
     } catch (error) {
       // 기타 오류 처리
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       // 인증되지 않은 상태로 처리 (오류로 처리하지 않음)
-      return { isAuthenticated: false, user: null as any } as AuthResponse;
+      return { isAuthenticated: false, user: null };
     }
   }
 );
@@ -103,8 +106,9 @@ export const updateProfile = createAsyncThunk<User, Partial<User>, { rejectValue
   async (userData, { rejectWithValue }) => {
     try {
       return await apiClient.auth.updateProfile(userData);
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Profile update failed');
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Profile update failed';
+      return rejectWithValue(errorMessage);
     }
   }
 );
@@ -116,8 +120,9 @@ export const changePassword = createAsyncThunk<
 >('auth/changePassword', async ({ currentPassword, newPassword }, { rejectWithValue }) => {
   try {
     return await apiClient.auth.changePassword(currentPassword, newPassword);
-  } catch (error: any) {
-    return rejectWithValue(error.message || 'Password change failed');
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Password change failed';
+    return rejectWithValue(errorMessage);
   }
 });
 
@@ -182,7 +187,8 @@ const authSlice = createSlice({
       .addCase(checkAuthStatus.pending, state => {
         state.isLoading = true;
       })
-      .addCase(checkAuthStatus.fulfilled, (state, action: PayloadAction<AuthResponse>) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .addCase(checkAuthStatus.fulfilled, (state, action: PayloadAction<any>) => {
         state.isLoading = false;
         state.isAuthenticated = action.payload.isAuthenticated;
         state.user = action.payload.user;

@@ -176,7 +176,7 @@ JaePa는 핵심 기능이 모두 구현되었으며, 프론트엔드, 백엔드,
 
 ## 프로젝트 리소스
 
-- **저장소**: GitHub - [https://github.com/yourusername/jaepa](https://github.com/yourusername/jaepa)
+- **저장소**: GitHub - [https://github.com/jaaesung/jaepa]
 - **문서**: `/docs` 디렉토리 참조
 - **이슈 트래킹**: GitHub 이슈 사용
 - **배포 가이드**: `/docs/deployment/README.md` 참조

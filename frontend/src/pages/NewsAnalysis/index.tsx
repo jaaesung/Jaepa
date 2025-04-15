@@ -187,7 +187,7 @@ const NewsAnalysis: React.FC = () => {
 
             <div className="filter-form">
               <div className="filter-group">
-                <label>날짜 범위</label>
+                <label htmlFor="startDate">날짜 범위</label>
                 <div className="date-range">
                   <input
                     type="date"
@@ -208,7 +208,7 @@ const NewsAnalysis: React.FC = () => {
               </div>
 
               <div className="filter-group">
-                <label>뉴스 소스</label>
+                <label htmlFor="source">뉴스 소스</label>
                 <select name="source" value={filters.source} onChange={handleFilterChange}>
                   <option value="">전체</option>
                   {sampleNewsSources.map(source => (
@@ -220,7 +220,7 @@ const NewsAnalysis: React.FC = () => {
               </div>
 
               <div className="filter-group">
-                <label>감성 분류</label>
+                <label htmlFor="sentiment">감성 분류</label>
                 <select name="sentiment" value={filters.sentiment} onChange={handleFilterChange}>
                   <option value="">전체</option>
                   <option value="positive">긍정적</option>
@@ -230,7 +230,7 @@ const NewsAnalysis: React.FC = () => {
               </div>
 
               <div className="filter-group">
-                <label>키워드 검색</label>
+                <label htmlFor="keyword">키워드 검색</label>
                 <input
                   type="text"
                   name="keyword"
@@ -251,8 +251,8 @@ const NewsAnalysis: React.FC = () => {
             </div>
 
             <div className="sort-options">
-              <label>정렬 기준:</label>
-              <select value={sortBy} onChange={handleSortChange}>
+              <label htmlFor="sortBy">정렬 기준:</label>
+              <select id="sortBy" value={sortBy} onChange={handleSortChange}>
                 <option value="date">날짜</option>
                 <option value="sentiment">감성 점수</option>
                 <option value="relevance">관련성</option>

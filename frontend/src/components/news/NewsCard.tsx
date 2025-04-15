@@ -49,6 +49,14 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, onSelect }) => {
     <div
       className={`news-card ${sentimentClass}`}
       onClick={handleClick}
+      onKeyDown={e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          handleClick();
+        }
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label={`뉴스 기사: ${article.title}`}
       style={{
         border: '1px solid #f0f0f0',
         borderRadius: '8px',

@@ -12,7 +12,7 @@ export type AsyncThunkConfig = {
   rejectedMeta?: unknown;
 };
 
-export type PeriodType = "1d" | "1w" | "1m" | "3m" | "6m" | "1y";
+export type PeriodType = '1d' | '1w' | '1m' | '3m' | '6m' | '1y';
 
 export interface FetchStockDataParams {
   symbol: string;
@@ -55,7 +55,7 @@ export interface RegisterCredentials {
 
 export interface AuthResponse {
   isAuthenticated: boolean;
-  user: User;
+  user: User | null;
   token?: string;
 }
 
@@ -168,7 +168,7 @@ export interface StockState {
 // UI 상태 관련 타입
 export interface UiState {
   sidebarOpen: boolean;
-  theme: "light" | "dark";
+  theme: 'light' | 'dark';
   notifications: Notification[];
 }
 
@@ -176,7 +176,7 @@ export interface UiState {
 export interface Notification {
   id: string;
   message: string;
-  type: "info" | "success" | "warning" | "error";
+  type: 'info' | 'success' | 'warning' | 'error';
   read: boolean;
   createdAt: string;
 }
