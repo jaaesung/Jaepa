@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
-from .api import auth_routes, user_routes
+from .api import auth_routes, user_routes, news_routes
 
 # 환경 변수 로드
 load_dotenv()
@@ -39,6 +39,7 @@ app.add_middleware(
 # API 라우트 등록
 app.include_router(auth_routes.router)
 app.include_router(user_routes.router)
+app.include_router(news_routes.router)
 
 # 기본 라우트
 @app.get("/")

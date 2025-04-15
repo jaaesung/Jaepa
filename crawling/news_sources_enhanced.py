@@ -22,13 +22,13 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 
 # 개선된 요청 모듈 가져오기
-from enhanced_request import make_request_with_retry, get_random_user_agent
+from crawling.enhanced_request import make_request_with_retry, get_random_user_agent
 import finnhub
 from dateutil import parser as dateutil_parser
 from rapidfuzz import fuzz
 
 # 통합 API 클라이언트 모듈 가져오기
-from api_clients import FinnhubClient, NewsDataClient, AlphaVantageClient
+from crawling.api_clients import FinnhubClient, NewsDataClient, AlphaVantageClient
 
 # 로깅 설정
 logging.basicConfig(

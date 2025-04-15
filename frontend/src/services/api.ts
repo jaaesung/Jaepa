@@ -89,6 +89,76 @@ api.interceptors.response.use(
 
 import { NewsArticle, StockData } from "../types";
 
+// 뉴스 API 함수
+
+/**
+ * 키워드로 뉴스 검색
+ * @param query 검색어
+ * @param days 검색 기간 (일)
+ * @param limit 최대 검색 결과 수
+ * @param forceUpdate 강제 업데이트 여부
+ * @returns 검색 결과
+ */
+export const searchNews = async (
+  query: string,
+  days: number = 30,
+  limit: number = 50,
+  forceUpdate: boolean = false
+) => {
+  try {
+    const response = await api.get("/news/search", {
+      params: { query, days, limit, force_update: forceUpdate },
+    });
+    return response.data.results.map((article: any) =>
+      adaptNewsArticle(article)
+    );
+  } catch (error) {
+    console.error("News search error:", error);
+    throw error;
+  }
+};
+
+/**
+ * 특정 주식 심볼에 대한 뉴스 조회
+ * @param symbol 주식 심볼 (예: AAPL)
+ * @param days 검색 기간 (일)
+ * @param limit 최대 검색 결과 수
+ * @param forceUpdate 강제 업데이트 여부
+ * @returns 뉴스 목록
+ */
+export const getNewsBySymbol = async (
+  symbol: string,
+  days: number = 7,
+  limit: number = 50,
+  forceUpdate: boolean = false
+) => {
+  try {
+    const response = await api.get(`/news/symbol/${symbol}`, {
+      params: { days, limit, force_update: forceUpdate },
+    });
+    return response.data.results.map((article: any) =>
+      adaptNewsArticle(article)
+    );
+  } catch (error) {
+    console.error("News by symbol error:", error);
+    throw error;
+  }
+};
+
+/**
+ * 뉴스 소스 목록 조회
+ * @returns 뉴스 소스 목록
+ */
+export const getNewsSources = async () => {
+  try {
+    const response = await api.get("/news/sources");
+    return response.data.sources;
+  } catch (error) {
+    console.error("News sources error:", error);
+    throw error;
+  }
+};
+
 // 데이터 모델 어댑터 함수
 
 interface BackendNewsArticle {
