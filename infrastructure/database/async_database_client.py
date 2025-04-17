@@ -13,7 +13,7 @@ import motor.motor_asyncio
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase, AsyncIOMotorCollection
 from pymongo import IndexModel, ASCENDING, DESCENDING, TEXT
 from pymongo.errors import (
-    ConnectionFailure, ServerSelectionTimeoutError, 
+    ConnectionFailure, ServerSelectionTimeoutError,
     OperationFailure, DuplicateKeyError
 )
 
@@ -24,195 +24,331 @@ logger = logging.getLogger(__name__)
 class AsyncDatabaseClientInterface(ABC):
     """
     비동기 데이터베이스 클라이언트 인터페이스
-    
+
     비동기 데이터베이스 연결 및 기본 작업을 위한 인터페이스를 정의합니다.
     """
-    
+
     @abstractmethod
     async def connect(self) -> bool:
         """
         데이터베이스 연결
-        
+
         Returns:
             bool: 연결 성공 여부
         """
         pass
-    
+
     @abstractmethod
     async def close(self) -> None:
         """
         데이터베이스 연결 종료
         """
         pass
-    
+
     @abstractmethod
     async def is_connected(self) -> bool:
         """
         연결 상태 확인
-        
+
         Returns:
             bool: 연결 상태
         """
         pass
-    
+
     @abstractmethod
     def get_database(self, db_name: Optional[str] = None) -> Any:
         """
         데이터베이스 객체 가져오기
-        
+
         Args:
             db_name: 데이터베이스 이름 (None인 경우 기본 데이터베이스)
-            
+
         Returns:
             Any: 데이터베이스 객체
         """
         pass
-    
+
     @abstractmethod
     def get_collection(self, collection_name: str, db_name: Optional[str] = None) -> Any:
         """
         컬렉션 객체 가져오기
-        
+
         Args:
             collection_name: 컬렉션 이름
             db_name: 데이터베이스 이름 (None인 경우 기본 데이터베이스)
-            
+
         Returns:
             Any: 컬렉션 객체
         """
         pass
-    
+
     @abstractmethod
     async def create_index(
-        self, 
-        collection_name: str, 
-        keys: List[Tuple[str, int]], 
+        self,
+        collection_name: str,
+        keys: List[Tuple[str, int]],
         index_name: Optional[str] = None,
         unique: bool = False,
         db_name: Optional[str] = None
     ) -> str:
         """
         인덱스 생성
-        
+
         Args:
             collection_name: 컬렉션 이름
             keys: 인덱스 키 목록 [(필드명, 방향), ...]
             index_name: 인덱스 이름 (None인 경우 자동 생성)
             unique: 고유 인덱스 여부
             db_name: 데이터베이스 이름 (None인 경우 기본 데이터베이스)
-            
+
         Returns:
             str: 생성된 인덱스 이름
         """
         pass
-    
+
     @abstractmethod
     async def create_text_index(
-        self, 
-        collection_name: str, 
-        fields: List[str], 
+        self,
+        collection_name: str,
+        fields: List[str],
         weights: Optional[Dict[str, int]] = None,
         index_name: Optional[str] = None,
         db_name: Optional[str] = None
     ) -> str:
         """
         텍스트 인덱스 생성
-        
+
         Args:
             collection_name: 컬렉션 이름
             fields: 인덱스 필드 목록
             weights: 필드별 가중치 (None인 경우 모두 1)
             index_name: 인덱스 이름 (None인 경우 자동 생성)
             db_name: 데이터베이스 이름 (None인 경우 기본 데이터베이스)
-            
+
         Returns:
             str: 생성된 인덱스 이름
         """
         pass
-    
+
     @abstractmethod
     async def list_indexes(self, collection_name: str, db_name: Optional[str] = None) -> List[Dict[str, Any]]:
         """
         인덱스 목록 조회
-        
+
         Args:
             collection_name: 컬렉션 이름
             db_name: 데이터베이스 이름 (None인 경우 기본 데이터베이스)
-            
+
         Returns:
             List[Dict[str, Any]]: 인덱스 정보 목록
         """
         pass
-    
+
     @abstractmethod
     async def drop_index(self, collection_name: str, index_name: str, db_name: Optional[str] = None) -> bool:
         """
         인덱스 삭제
-        
+
         Args:
             collection_name: 컬렉션 이름
             index_name: 인덱스 이름
             db_name: 데이터베이스 이름 (None인 경우 기본 데이터베이스)
-            
+
         Returns:
             bool: 삭제 성공 여부
         """
         pass
-    
+
     @abstractmethod
     async def health_check(self) -> Dict[str, Any]:
         """
         데이터베이스 상태 확인
-        
+
         Returns:
             Dict[str, Any]: 상태 정보
         """
         pass
-    
+
     @abstractmethod
     async def begin_transaction(self) -> Any:
         """
         트랜잭션 시작
-        
+
         Returns:
             Any: 트랜잭션 세션
         """
         pass
-    
+
     @abstractmethod
     async def commit_transaction(self, session: Any) -> bool:
         """
         트랜잭션 커밋
-        
+
         Args:
             session: 트랜잭션 세션
-            
+
         Returns:
             bool: 커밋 성공 여부
         """
         pass
-    
+
     @abstractmethod
     async def abort_transaction(self, session: Any) -> bool:
         """
         트랜잭션 롤백
-        
+
         Args:
             session: 트랜잭션 세션
-            
+
         Returns:
             bool: 롤백 성공 여부
         """
         pass
-    
+
     @abstractmethod
     async def with_transaction(self, callback: Callable[[Any], Any]) -> Any:
         """
         트랜잭션 내에서 콜백 실행
-        
+
         Args:
             callback: 트랜잭션 내에서 실행할 콜백 함수
-            
+
+        Returns:
+            Any: 콜백 함수의 반환값
+        """
+        pass
+
+    @abstractmethod
+    async def create_index(
+        self,
+        collection_name: str,
+        keys: List[Tuple[str, int]],
+        index_name: Optional[str] = None,
+        unique: bool = False,
+        db_name: Optional[str] = None
+    ) -> str:
+        """
+        인덱스 생성
+
+        Args:
+            collection_name: 컬렉션 이름
+            keys: 인덱스 키 목록 [(필드명, 방향), ...]
+            index_name: 인덱스 이름 (None인 경우 자동 생성)
+            unique: 고유 인덱스 여부
+            db_name: 데이터베이스 이름 (None인 경우 기본 데이터베이스)
+
+        Returns:
+            str: 생성된 인덱스 이름
+        """
+        pass
+
+    @abstractmethod
+    async def create_text_index(
+        self,
+        collection_name: str,
+        fields: List[str],
+        weights: Optional[Dict[str, int]] = None,
+        index_name: Optional[str] = None,
+        db_name: Optional[str] = None
+    ) -> str:
+        """
+        텍스트 인덱스 생성
+
+        Args:
+            collection_name: 컬렉션 이름
+            fields: 인덱스 필드 목록
+            weights: 필드별 가중치 (None인 경우 모두 1)
+            index_name: 인덱스 이름 (None인 경우 자동 생성)
+            db_name: 데이터베이스 이름 (None인 경우 기본 데이터베이스)
+
+        Returns:
+            str: 생성된 인덱스 이름
+        """
+        pass
+
+    @abstractmethod
+    async def list_indexes(self, collection_name: str, db_name: Optional[str] = None) -> List[Dict[str, Any]]:
+        """
+        인덱스 목록 조회
+
+        Args:
+            collection_name: 컬렉션 이름
+            db_name: 데이터베이스 이름 (None인 경우 기본 데이터베이스)
+
+        Returns:
+            List[Dict[str, Any]]: 인덱스 정보 목록
+        """
+        pass
+
+    @abstractmethod
+    async def drop_index(self, collection_name: str, index_name: str, db_name: Optional[str] = None) -> bool:
+        """
+        인덱스 삭제
+
+        Args:
+            collection_name: 컬렉션 이름
+            index_name: 인덱스 이름
+            db_name: 데이터베이스 이름 (None인 경우 기본 데이터베이스)
+
+        Returns:
+            bool: 삭제 성공 여부
+        """
+        pass
+
+    @abstractmethod
+    async def health_check(self) -> Dict[str, Any]:
+        """
+        데이터베이스 상태 확인
+
+        Returns:
+            Dict[str, Any]: 상태 정보
+        """
+        pass
+
+    @abstractmethod
+    async def begin_transaction(self) -> Any:
+        """
+        트랜잭션 시작
+
+        Returns:
+            Any: 트랜잭션 세션
+        """
+        pass
+
+    @abstractmethod
+    async def commit_transaction(self, session: Any) -> bool:
+        """
+        트랜잭션 커밋
+
+        Args:
+            session: 트랜잭션 세션
+
+        Returns:
+            bool: 커밋 성공 여부
+        """
+        pass
+
+    @abstractmethod
+    async def abort_transaction(self, session: Any) -> bool:
+        """
+        트랜잭션 롤백
+
+        Args:
+            session: 트랜잭션 세션
+
+        Returns:
+            bool: 롤백 성공 여부
+        """
+        pass
+
+    @abstractmethod
+    async def with_transaction(self, callback: Callable[[Any], Any]) -> Any:
+        """
+        트랜잭션 내에서 콜백 실행
+
+        Args:
+            callback: 트랜잭션 내에서 실행할 콜백 함수
+
         Returns:
             Any: 콜백 함수의 반환값
         """
@@ -222,10 +358,10 @@ class AsyncDatabaseClientInterface(ABC):
 class AsyncMongoDBClient(AsyncDatabaseClientInterface):
     """
     비동기 MongoDB 클라이언트 구현
-    
+
     비동기 MongoDB 데이터베이스 연결 및 기본 작업을 구현합니다.
     """
-    
+
     def __init__(
         self,
         uri: str,
@@ -243,7 +379,7 @@ class AsyncMongoDBClient(AsyncDatabaseClientInterface):
     ):
         """
         AsyncMongoDBClient 초기화
-        
+
         Args:
             uri: MongoDB 연결 URI
             default_db_name: 기본 데이터베이스 이름
@@ -270,23 +406,23 @@ class AsyncMongoDBClient(AsyncDatabaseClientInterface):
         self.socket_timeout_ms = socket_timeout_ms
         self.heartbeat_frequency_ms = heartbeat_frequency_ms
         self.app_name = app_name
-        
+
         self.client = None
         self.db = None
         self._connected = False
         self._last_connection_check = 0
         self._connection_check_interval = 60  # 초
-    
+
     async def connect(self) -> bool:
         """
         MongoDB 연결
-        
+
         Returns:
             bool: 연결 성공 여부
         """
         if self.client is not None:
             return True
-        
+
         try:
             # 연결 옵션 설정
             options = {
@@ -301,43 +437,43 @@ class AsyncMongoDBClient(AsyncDatabaseClientInterface):
                 "heartbeatFrequencyMS": self.heartbeat_frequency_ms,
                 "appName": self.app_name
             }
-            
+
             # MongoDB 클라이언트 생성
             self.client = AsyncIOMotorClient(self.uri, **options)
-            
+
             # 연결 테스트
             await self.client.admin.command('ping')
-            
+
             # 기본 데이터베이스 설정
             self.db = self.client[self.default_db_name]
-            
+
             self._connected = True
             self._last_connection_check = time.time()
-            
+
             logger.info(f"MongoDB 연결 성공: {self.uri}, DB: {self.default_db_name}")
             return True
-            
+
         except (ConnectionFailure, ServerSelectionTimeoutError) as e:
             logger.error(f"MongoDB 연결 실패: {str(e)}")
             self.client = None
             self.db = None
             self._connected = False
             return False
-            
+
         except Exception as e:
             logger.error(f"MongoDB 연결 중 예외 발생: {str(e)}")
             self.client = None
             self.db = None
             self._connected = False
             return False
-    
+
     async def close(self) -> None:
         """
         MongoDB 연결 종료
         """
         if self.client:
             try:
-                self.client.close()
+                await self.client.close()
                 logger.info("MongoDB 연결 종료")
             except Exception as e:
                 logger.error(f"MongoDB 연결 종료 중 오류: {str(e)}")
@@ -345,11 +481,11 @@ class AsyncMongoDBClient(AsyncDatabaseClientInterface):
                 self.client = None
                 self.db = None
                 self._connected = False
-    
+
     async def is_connected(self) -> bool:
         """
         연결 상태 확인
-        
+
         Returns:
             bool: 연결 상태
         """
@@ -357,11 +493,11 @@ class AsyncMongoDBClient(AsyncDatabaseClientInterface):
         current_time = time.time()
         if current_time - self._last_connection_check < self._connection_check_interval:
             return self._connected
-        
+
         if not self.client:
             self._connected = False
             return False
-        
+
         try:
             # 연결 테스트
             await self.client.admin.command('ping')
@@ -371,117 +507,117 @@ class AsyncMongoDBClient(AsyncDatabaseClientInterface):
         except Exception:
             self._connected = False
             return False
-    
+
     def get_database(self, db_name: Optional[str] = None) -> AsyncIOMotorDatabase:
         """
         데이터베이스 객체 가져오기
-        
+
         Args:
             db_name: 데이터베이스 이름 (None인 경우 기본 데이터베이스)
-            
+
         Returns:
             AsyncIOMotorDatabase: 데이터베이스 객체
-            
+
         Raises:
             ConnectionError: 연결 실패 시
         """
         if not self.client:
             raise ConnectionError("MongoDB 연결 실패")
-        
+
         db_name = db_name or self.default_db_name
         return self.client[db_name]
-    
+
     def get_collection(self, collection_name: str, db_name: Optional[str] = None) -> AsyncIOMotorCollection:
         """
         컬렉션 객체 가져오기
-        
+
         Args:
             collection_name: 컬렉션 이름
             db_name: 데이터베이스 이름 (None인 경우 기본 데이터베이스)
-            
+
         Returns:
             AsyncIOMotorCollection: 컬렉션 객체
-            
+
         Raises:
             ConnectionError: 연결 실패 시
         """
         db = self.get_database(db_name)
         return db[collection_name]
-    
+
     async def create_index(
-        self, 
-        collection_name: str, 
-        keys: List[Tuple[str, int]], 
+        self,
+        collection_name: str,
+        keys: List[Tuple[str, int]],
         index_name: Optional[str] = None,
         unique: bool = False,
         db_name: Optional[str] = None
     ) -> str:
         """
         인덱스 생성
-        
+
         Args:
             collection_name: 컬렉션 이름
             keys: 인덱스 키 목록 [(필드명, 방향), ...]
             index_name: 인덱스 이름 (None인 경우 자동 생성)
             unique: 고유 인덱스 여부
             db_name: 데이터베이스 이름 (None인 경우 기본 데이터베이스)
-            
+
         Returns:
             str: 생성된 인덱스 이름
-            
+
         Raises:
             ConnectionError: 연결 실패 시
             OperationError: 인덱스 생성 실패 시
         """
         collection = self.get_collection(collection_name, db_name)
-        
+
         try:
             # 인덱스 생성
             index_name = await collection.create_index(
-                keys, 
+                keys,
                 name=index_name,
                 unique=unique,
                 background=True  # 백그라운드에서 인덱스 생성
             )
-            
+
             logger.info(f"인덱스 생성 성공: {collection_name}.{index_name}")
             return index_name
-            
+
         except DuplicateKeyError:
             logger.warning(f"이미 존재하는 인덱스: {collection_name}.{index_name}")
             return index_name
-            
+
         except OperationFailure as e:
             logger.error(f"인덱스 생성 실패: {str(e)}")
             raise
-    
+
     async def create_text_index(
-        self, 
-        collection_name: str, 
-        fields: List[str], 
+        self,
+        collection_name: str,
+        fields: List[str],
         weights: Optional[Dict[str, int]] = None,
         index_name: Optional[str] = None,
         db_name: Optional[str] = None
     ) -> str:
         """
         텍스트 인덱스 생성
-        
+
         Args:
             collection_name: 컬렉션 이름
             fields: 인덱스 필드 목록
             weights: 필드별 가중치 (None인 경우 모두 1)
             index_name: 인덱스 이름 (None인 경우 자동 생성)
             db_name: 데이터베이스 이름 (None인 경우 기본 데이터베이스)
-            
+
         Returns:
             str: 생성된 인덱스 이름
-            
+
         Raises:
             ConnectionError: 연결 실패 시
             OperationError: 인덱스 생성 실패 시
         """
         collection = self.get_collection(collection_name, db_name)
-        
+
         try:
             # 기존 텍스트 인덱스 확인 및 삭제
             existing_indexes = await collection.index_information()
@@ -492,10 +628,10 @@ class AsyncMongoDBClient(AsyncDatabaseClientInterface):
                         logger.info(f"기존 텍스트 인덱스 '{idx_name}' 삭제됨")
                     except Exception as e:
                         logger.warning(f"텍스트 인덱스 '{idx_name}' 삭제 중 오류: {str(e)}")
-            
+
             # 텍스트 인덱스 생성
             index_keys = [(field, TEXT) for field in fields]
-            
+
             # 인덱스 생성
             index_name = await collection.create_index(
                 index_keys,
@@ -503,34 +639,34 @@ class AsyncMongoDBClient(AsyncDatabaseClientInterface):
                 weights=weights,
                 background=True  # 백그라운드에서 인덱스 생성
             )
-            
+
             logger.info(f"텍스트 인덱스 생성 성공: {collection_name}.{index_name}")
             return index_name
-            
+
         except OperationFailure as e:
             logger.error(f"텍스트 인덱스 생성 실패: {str(e)}")
             raise
-    
+
     async def list_indexes(self, collection_name: str, db_name: Optional[str] = None) -> List[Dict[str, Any]]:
         """
         인덱스 목록 조회
-        
+
         Args:
             collection_name: 컬렉션 이름
             db_name: 데이터베이스 이름 (None인 경우 기본 데이터베이스)
-            
+
         Returns:
             List[Dict[str, Any]]: 인덱스 정보 목록
-            
+
         Raises:
             ConnectionError: 연결 실패 시
         """
         collection = self.get_collection(collection_name, db_name)
-        
+
         try:
             # 인덱스 정보 조회
             indexes = await collection.index_information()
-            
+
             # 결과 변환
             result = []
             for name, info in indexes.items():
@@ -540,44 +676,44 @@ class AsyncMongoDBClient(AsyncDatabaseClientInterface):
                     "unique": info.get("unique", False),
                     "weights": info.get("weights", {})
                 })
-            
+
             return result
-            
+
         except Exception as e:
             logger.error(f"인덱스 목록 조회 실패: {str(e)}")
             raise
-    
+
     async def drop_index(self, collection_name: str, index_name: str, db_name: Optional[str] = None) -> bool:
         """
         인덱스 삭제
-        
+
         Args:
             collection_name: 컬렉션 이름
             index_name: 인덱스 이름
             db_name: 데이터베이스 이름 (None인 경우 기본 데이터베이스)
-            
+
         Returns:
             bool: 삭제 성공 여부
-            
+
         Raises:
             ConnectionError: 연결 실패 시
         """
         collection = self.get_collection(collection_name, db_name)
-        
+
         try:
             # 인덱스 삭제
             await collection.drop_index(index_name)
             logger.info(f"인덱스 삭제 성공: {collection_name}.{index_name}")
             return True
-            
+
         except OperationFailure as e:
             logger.error(f"인덱스 삭제 실패: {str(e)}")
             return False
-    
+
     async def health_check(self) -> Dict[str, Any]:
         """
         데이터베이스 상태 확인
-        
+
         Returns:
             Dict[str, Any]: 상태 정보
         """
@@ -586,20 +722,20 @@ class AsyncMongoDBClient(AsyncDatabaseClientInterface):
             "timestamp": datetime.now().isoformat(),
             "details": {}
         }
-        
+
         if not self.client:
             result["status"] = "disconnected"
             return result
-        
+
         try:
             # 연결 테스트
             start_time = time.time()
             await self.client.admin.command('ping')
             response_time = time.time() - start_time
-            
+
             # 서버 상태 조회
             server_status = await self.client.admin.command('serverStatus')
-            
+
             # 결과 설정
             result["status"] = "connected"
             result["details"] = {
@@ -611,64 +747,64 @@ class AsyncMongoDBClient(AsyncDatabaseClientInterface):
                 },
                 "version": server_status.get("version", "unknown")
             }
-            
+
             return result
-            
+
         except Exception as e:
             result["status"] = "error"
             result["details"] = {"error": str(e)}
             return result
-    
+
     async def begin_transaction(self) -> Any:
         """
         트랜잭션 시작
-        
+
         Returns:
             Any: 트랜잭션 세션
-            
+
         Raises:
             ConnectionError: 연결 실패 시
         """
         if not await self.is_connected():
             if not await self.connect():
                 raise ConnectionError("MongoDB 연결 실패")
-        
+
         try:
             # 세션 시작
             session = await self.client.start_session()
-            
+
             # 트랜잭션 시작
             session.start_transaction()
-            
+
             logger.debug("트랜잭션 시작")
             return session
-            
+
         except Exception as e:
             logger.error(f"트랜잭션 시작 실패: {str(e)}")
             raise
-    
+
     async def commit_transaction(self, session: Any) -> bool:
         """
         트랜잭션 커밋
-        
+
         Args:
             session: 트랜잭션 세션
-            
+
         Returns:
             bool: 커밋 성공 여부
         """
         if not session:
             logger.error("세션이 없습니다.")
             return False
-        
+
         try:
             # 트랜잭션 커밋
             await session.commit_transaction()
             await session.end_session()
-            
+
             logger.debug("트랜잭션 커밋 성공")
             return True
-            
+
         except Exception as e:
             logger.error(f"트랜잭션 커밋 실패: {str(e)}")
             try:
@@ -677,29 +813,29 @@ class AsyncMongoDBClient(AsyncDatabaseClientInterface):
             except Exception:
                 pass
             return False
-    
+
     async def abort_transaction(self, session: Any) -> bool:
         """
         트랜잭션 롤백
-        
+
         Args:
             session: 트랜잭션 세션
-            
+
         Returns:
             bool: 롤백 성공 여부
         """
         if not session:
             logger.error("세션이 없습니다.")
             return False
-        
+
         try:
             # 트랜잭션 롤백
             await session.abort_transaction()
             await session.end_session()
-            
+
             logger.debug("트랜잭션 롤백 성공")
             return True
-            
+
         except Exception as e:
             logger.error(f"트랜잭션 롤백 실패: {str(e)}")
             try:
@@ -707,38 +843,38 @@ class AsyncMongoDBClient(AsyncDatabaseClientInterface):
             except Exception:
                 pass
             return False
-    
+
     async def with_transaction(self, callback: Callable[[Any], Any]) -> Any:
         """
         트랜잭션 내에서 콜백 실행
-        
+
         Args:
             callback: 트랜잭션 내에서 실행할 콜백 함수
-            
+
         Returns:
             Any: 콜백 함수의 반환값
-            
+
         Raises:
             ConnectionError: 연결 실패 시
         """
         if not await self.is_connected():
             if not await self.connect():
                 raise ConnectionError("MongoDB 연결 실패")
-        
+
         session = None
         try:
             # 세션 시작
             session = await self.client.start_session()
-            
+
             # 트랜잭션 내에서 콜백 실행
             result = await session.with_transaction(lambda s: callback(s))
-            
+
             return result
-            
+
         except Exception as e:
             logger.error(f"트랜잭션 실행 실패: {str(e)}")
             raise
-            
+
         finally:
             if session:
                 await session.end_session()
