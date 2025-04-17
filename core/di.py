@@ -8,9 +8,9 @@ from typing import Dict, Any, Optional
 
 from dependency_injector import containers, providers
 
-from config import settings
+from core.config import settings
 from core.interfaces import (
-    DatabaseClient, MongoDBClient, HttpClient, 
+    DatabaseClient, MongoDBClient, HttpClient,
     NewsSourceManager, SentimentAnalyzer
 )
 
@@ -21,48 +21,48 @@ logger = logging.getLogger(__name__)
 class Container(containers.DeclarativeContainer):
     """
     의존성 주입 컨테이너
-    
+
     JaePa 프로젝트의 의존성 주입 컨테이너를 정의합니다.
     """
-    
+
     # 설정 제공자
     config = providers.Configuration()
-    
+
     # 설정 로드
     config.from_dict(settings.model_dump())
-    
+
     # 로깅 제공자
     logging = providers.Resource(
         logging.basicConfig,
         level=getattr(logging, config.logging.level),
         format=config.logging.format,
     )
-    
+
     # 데이터베이스 클라이언트 제공자 (싱글톤)
     mongodb_client = providers.Singleton(
         lambda: None,  # 실제 구현체는 나중에 등록
         config=config.db,
     )
-    
+
     # HTTP 클라이언트 제공자 (싱글톤)
     http_client = providers.Singleton(
         lambda: None,  # 실제 구현체는 나중에 등록
         config=config.api,
     )
-    
+
     # 뉴스 소스 관리자 제공자 (싱글톤)
     news_source_manager = providers.Singleton(
         lambda: None,  # 실제 구현체는 나중에 등록
         http_client=http_client,
         config=config.crawling,
     )
-    
+
     # 감성 분석기 제공자 (싱글톤)
     sentiment_analyzer = providers.Singleton(
         lambda: None,  # 실제 구현체는 나중에 등록
         config=config.sentiment,
     )
-    
+
     # 뉴스 크롤러 제공자 (팩토리)
     news_crawler = providers.Factory(
         lambda: None,  # 실제 구현체는 나중에 등록
@@ -71,7 +71,7 @@ class Container(containers.DeclarativeContainer):
         mongodb_client=mongodb_client,
         config=config.crawling,
     )
-    
+
     # 감성 분석 서비스 제공자 (팩토리)
     sentiment_analysis_service = providers.Factory(
         lambda: None,  # 실제 구현체는 나중에 등록
@@ -79,7 +79,7 @@ class Container(containers.DeclarativeContainer):
         mongodb_client=mongodb_client,
         config=config.sentiment,
     )
-    
+
     # 주식 데이터 서비스 제공자 (팩토리)
     stock_data_service = providers.Factory(
         lambda: None,  # 실제 구현체는 나중에 등록
@@ -96,13 +96,13 @@ container = Container()
 def register_mongodb_client(client_class):
     """
     MongoDB 클라이언트 구현체 등록
-    
+
     Args:
         client_class: MongoDBClient 인터페이스를 구현한 클래스
     """
     if not issubclass(client_class, MongoDBClient):
         raise TypeError(f"{client_class.__name__} is not a subclass of MongoDBClient")
-    
+
     container.mongodb_client.override(
         providers.Singleton(
             client_class,
@@ -115,13 +115,13 @@ def register_mongodb_client(client_class):
 def register_http_client(client_class):
     """
     HTTP 클라이언트 구현체 등록
-    
+
     Args:
         client_class: HttpClient 인터페이스를 구현한 클래스
     """
     if not issubclass(client_class, HttpClient):
         raise TypeError(f"{client_class.__name__} is not a subclass of HttpClient")
-    
+
     container.http_client.override(
         providers.Singleton(
             client_class,
@@ -134,13 +134,13 @@ def register_http_client(client_class):
 def register_news_source_manager(manager_class):
     """
     뉴스 소스 관리자 구현체 등록
-    
+
     Args:
         manager_class: NewsSourceManager 인터페이스를 구현한 클래스
     """
     if not issubclass(manager_class, NewsSourceManager):
         raise TypeError(f"{manager_class.__name__} is not a subclass of NewsSourceManager")
-    
+
     container.news_source_manager.override(
         providers.Singleton(
             manager_class,
@@ -154,13 +154,13 @@ def register_news_source_manager(manager_class):
 def register_sentiment_analyzer(analyzer_class):
     """
     감성 분석기 구현체 등록
-    
+
     Args:
         analyzer_class: SentimentAnalyzer 인터페이스를 구현한 클래스
     """
     if not issubclass(analyzer_class, SentimentAnalyzer):
         raise TypeError(f"{analyzer_class.__name__} is not a subclass of SentimentAnalyzer")
-    
+
     container.sentiment_analyzer.override(
         providers.Singleton(
             analyzer_class,
@@ -173,7 +173,7 @@ def register_sentiment_analyzer(analyzer_class):
 def register_news_crawler(crawler_class):
     """
     뉴스 크롤러 구현체 등록
-    
+
     Args:
         crawler_class: 뉴스 크롤러 클래스
     """
@@ -192,7 +192,7 @@ def register_news_crawler(crawler_class):
 def register_sentiment_analysis_service(service_class):
     """
     감성 분석 서비스 구현체 등록
-    
+
     Args:
         service_class: 감성 분석 서비스 클래스
     """
@@ -210,7 +210,7 @@ def register_sentiment_analysis_service(service_class):
 def register_stock_data_service(service_class):
     """
     주식 데이터 서비스 구현체 등록
-    
+
     Args:
         service_class: 주식 데이터 서비스 클래스
     """
@@ -228,7 +228,7 @@ def register_stock_data_service(service_class):
 def get_container() -> Container:
     """
     컨테이너 인스턴스 반환
-    
+
     Returns:
         Container: 컨테이너 인스턴스
     """
