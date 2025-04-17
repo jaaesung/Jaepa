@@ -1,0 +1,586 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "JaePa 프로젝트 설정 스키마",
+  "description": "JaePa 프로젝트의 설정 스키마입니다.",
+  "type": "object",
+  "properties": {
+    "project_name": {
+      "type": "string",
+      "description": "프로젝트 이름",
+      "default": "JaePa"
+    },
+    "project_description": {
+      "type": "string",
+      "description": "프로젝트 설명",
+      "default": "해외 금융 뉴스 크롤링과 감성 분석을 통한 투자 의사결정 도구"
+    },
+    "version": {
+      "type": "string",
+      "description": "프로젝트 버전",
+      "default": "0.1.0"
+    },
+    "debug": {
+      "type": "boolean",
+      "description": "디버그 모드 활성화 여부",
+      "default": false
+    },
+    "environment": {
+      "type": "string",
+      "description": "실행 환경",
+      "enum": ["development", "testing", "staging", "production"],
+      "default": "development"
+    },
+    "config_file": {
+      "type": "string",
+      "description": "설정 파일 경로",
+      "default": "config/config.json"
+    },
+    "db": {
+      "type": "object",
+      "description": "데이터베이스 설정",
+      "properties": {
+        "mongo_username": {
+          "type": "string",
+          "description": "MongoDB 사용자 이름",
+          "default": "jaepa_user"
+        },
+        "mongo_password": {
+          "type": "string",
+          "description": "MongoDB 비밀번호",
+          "default": "change_this_password"
+        },
+        "mongo_uri": {
+          "type": "string",
+          "description": "MongoDB URI",
+          "default": "mongodb://localhost:27017/"
+        },
+        "mongo_db_name": {
+          "type": "string",
+          "description": "MongoDB 데이터베이스 이름",
+          "default": "jaepa"
+        },
+        "news_collection": {
+          "type": "string",
+          "description": "뉴스 컬렉션 이름",
+          "default": "financial_news"
+        },
+        "sentiment_collection": {
+          "type": "string",
+          "description": "감성 분석 결과 컬렉션 이름",
+          "default": "news_sentiment"
+        },
+        "stock_data_collection": {
+          "type": "string",
+          "description": "주식 데이터 컬렉션 이름",
+          "default": "stock_data"
+        },
+        "crypto_data_collection": {
+          "type": "string",
+          "description": "암호화폐 데이터 컬렉션 이름",
+          "default": "crypto_data"
+        },
+        "user_collection": {
+          "type": "string",
+          "description": "사용자 컬렉션 이름",
+          "default": "users"
+        },
+        "symbol_news_relation_collection": {
+          "type": "string",
+          "description": "심볼-뉴스 관계 컬렉션 이름",
+          "default": "symbol_news_relation"
+        },
+        "news_sentiment_trends_collection": {
+          "type": "string",
+          "description": "뉴스 감성 트렌드 컬렉션 이름",
+          "default": "news_sentiment_trends"
+        },
+        "sentiment_stock_correlation_collection": {
+          "type": "string",
+          "description": "감성-주가 상관관계 컬렉션 이름",
+          "default": "sentiment_stock_correlation"
+        }
+      }
+    },
+    "api": {
+      "type": "object",
+      "description": "API 설정",
+      "properties": {
+        "host": {
+          "type": "string",
+          "description": "API 서버 호스트",
+          "default": "0.0.0.0"
+        },
+        "port": {
+          "type": "integer",
+          "description": "API 서버 포트",
+          "default": 8000
+        },
+        "debug": {
+          "type": "boolean",
+          "description": "API 디버그 모드 활성화 여부",
+          "default": false
+        },
+        "api_prefix": {
+          "type": "string",
+          "description": "API 경로 접두사",
+          "default": "/api"
+        },
+        "api_version": {
+          "type": "string",
+          "description": "API 버전",
+          "default": "v1"
+        },
+        "cors_origins": {
+          "type": "array",
+          "description": "CORS 허용 원본",
+          "items": {
+            "type": "string"
+          },
+          "default": ["http://localhost:80", "http://frontend"]
+        },
+        "cors_allow_credentials": {
+          "type": "boolean",
+          "description": "CORS 자격 증명 허용 여부",
+          "default": true
+        },
+        "cors_allow_methods": {
+          "type": "array",
+          "description": "CORS 허용 메서드",
+          "items": {
+            "type": "string"
+          },
+          "default": ["*"]
+        },
+        "cors_allow_headers": {
+          "type": "array",
+          "description": "CORS 허용 헤더",
+          "items": {
+            "type": "string"
+          },
+          "default": ["*"]
+        }
+      }
+    },
+    "crawling": {
+      "type": "object",
+      "description": "크롤링 설정",
+      "properties": {
+        "timeout": {
+          "type": "integer",
+          "description": "요청 타임아웃 (초)",
+          "default": 30
+        },
+        "retries": {
+          "type": "integer",
+          "description": "요청 재시도 횟수",
+          "default": 3
+        },
+        "retry_delay": {
+          "type": "integer",
+          "description": "요청 재시도 간격 (초)",
+          "default": 2
+        },
+        "user_agent": {
+          "type": "string",
+          "description": "사용자 에이전트",
+          "default": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        },
+        "requests_per_minute": {
+          "type": "integer",
+          "description": "분당 최대 요청 수",
+          "default": 10
+        },
+        "pause_between_requests": {
+          "type": "integer",
+          "description": "요청 간 대기 시간 (초)",
+          "default": 6
+        },
+        "rss_feeds": {
+          "type": "object",
+          "description": "RSS 피드 설정",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "피드 이름"
+              },
+              "url": {
+                "type": "string",
+                "description": "피드 URL"
+              },
+              "fallback_url": {
+                "type": "string",
+                "description": "대체 URL"
+              }
+            }
+          }
+        },
+        "news_sources": {
+          "type": "object",
+          "description": "뉴스 소스 설정",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "base_url": {
+                "type": "string",
+                "description": "기본 URL"
+              },
+              "search_url": {
+                "type": "string",
+                "description": "검색 URL 템플릿"
+              },
+              "latest_url": {
+                "type": "string",
+                "description": "최신 뉴스 URL"
+              },
+              "article_selector": {
+                "type": "string",
+                "description": "기사 선택자"
+              },
+              "content_selector": {
+                "type": "string",
+                "description": "내용 선택자"
+              },
+              "date_selector": {
+                "type": "string",
+                "description": "날짜 선택자"
+              },
+              "date_format": {
+                "type": "string",
+                "description": "날짜 형식"
+              }
+            }
+          }
+        },
+        "api_sources": {
+          "type": "object",
+          "description": "API 소스 설정",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "default_categories": {
+                "type": "array",
+                "description": "기본 카테고리",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "default_country": {
+                "type": "string",
+                "description": "기본 국가"
+              },
+              "rate_limit": {
+                "type": "object",
+                "description": "속도 제한 설정",
+                "properties": {
+                  "requests_per_minute": {
+                    "type": "integer",
+                    "description": "분당 최대 요청 수"
+                  },
+                  "pause_between_requests": {
+                    "type": "integer",
+                    "description": "요청 간 대기 시간 (초)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "data_normalization": {
+          "type": "object",
+          "description": "데이터 정규화 설정",
+          "properties": {
+            "title_similarity_threshold": {
+              "type": "integer",
+              "description": "제목 유사도 임계값",
+              "default": 85
+            },
+            "time_difference_seconds": {
+              "type": "integer",
+              "description": "시간 차이 임계값 (초)",
+              "default": 300
+            },
+            "field_mapping": {
+              "type": "object",
+              "description": "필드 매핑",
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "scheduler": {
+          "type": "object",
+          "description": "스케줄러 설정",
+          "properties": {
+            "news_update_interval": {
+              "type": "string",
+              "description": "뉴스 업데이트 간격",
+              "default": "6h"
+            },
+            "stock_data_update_interval": {
+              "type": "string",
+              "description": "주식 데이터 업데이트 간격",
+              "default": "24h"
+            },
+            "sentiment_analysis_interval": {
+              "type": "string",
+              "description": "감성 분석 간격",
+              "default": "6h"
+            }
+          }
+        }
+      }
+    },
+    "sentiment": {
+      "type": "object",
+      "description": "감성 분석 설정",
+      "properties": {
+        "model": {
+          "type": "string",
+          "description": "감성 분석 모델",
+          "default": "finbert"
+        },
+        "model_path": {
+          "type": "string",
+          "description": "모델 경로",
+          "default": "models/finbert"
+        },
+        "batch_size": {
+          "type": "integer",
+          "description": "배치 크기",
+          "default": 16
+        },
+        "positive_threshold": {
+          "type": "number",
+          "description": "긍정 임계값",
+          "default": 0.6
+        },
+        "negative_threshold": {
+          "type": "number",
+          "description": "부정 임계값",
+          "default": 0.6
+        },
+        "multilingual": {
+          "type": "boolean",
+          "description": "다국어 지원 여부",
+          "default": false
+        },
+        "languages": {
+          "type": "array",
+          "description": "지원 언어",
+          "items": {
+            "type": "string"
+          },
+          "default": ["en"]
+        }
+      }
+    },
+    "logging": {
+      "type": "object",
+      "description": "로깅 설정",
+      "properties": {
+        "level": {
+          "type": "string",
+          "description": "로그 레벨",
+          "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+          "default": "INFO"
+        },
+        "file_enabled": {
+          "type": "boolean",
+          "description": "파일 로깅 활성화 여부",
+          "default": false
+        },
+        "file_path": {
+          "type": "string",
+          "description": "로그 파일 경로",
+          "default": "logs/jaepa.log"
+        },
+        "format": {
+          "type": "string",
+          "description": "로그 형식",
+          "default": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        },
+        "rotation": {
+          "type": "string",
+          "description": "로그 회전 주기",
+          "default": "1 day"
+        },
+        "retention": {
+          "type": "string",
+          "description": "로그 보존 기간",
+          "default": "30 days"
+        },
+        "mask_sensitive_data": {
+          "type": "boolean",
+          "description": "민감 정보 마스킹 여부",
+          "default": true
+        },
+        "sensitive_fields": {
+          "type": "array",
+          "description": "민감 필드 목록",
+          "items": {
+            "type": "string"
+          },
+          "default": ["password", "secret", "token", "key", "auth", "credential"]
+        }
+      }
+    },
+    "security": {
+      "type": "object",
+      "description": "보안 설정",
+      "properties": {
+        "jwt_secret_key": {
+          "type": "string",
+          "description": "JWT 시크릿 키",
+          "default": "change_this_secret_key"
+        },
+        "jwt_algorithm": {
+          "type": "string",
+          "description": "JWT 알고리즘",
+          "enum": ["HS256", "HS384", "HS512", "RS256", "RS384", "RS512"],
+          "default": "HS256"
+        },
+        "access_token_expire_minutes": {
+          "type": "integer",
+          "description": "액세스 토큰 만료 시간 (분)",
+          "default": 30
+        },
+        "refresh_token_expire_days": {
+          "type": "integer",
+          "description": "리프레시 토큰 만료 시간 (일)",
+          "default": 7
+        },
+        "password_min_length": {
+          "type": "integer",
+          "description": "비밀번호 최소 길이",
+          "default": 8
+        },
+        "password_require_uppercase": {
+          "type": "boolean",
+          "description": "비밀번호 대문자 요구 여부",
+          "default": true
+        },
+        "password_require_lowercase": {
+          "type": "boolean",
+          "description": "비밀번호 소문자 요구 여부",
+          "default": true
+        },
+        "password_require_digit": {
+          "type": "boolean",
+          "description": "비밀번호 숫자 요구 여부",
+          "default": true
+        },
+        "password_require_special": {
+          "type": "boolean",
+          "description": "비밀번호 특수문자 요구 여부",
+          "default": true
+        },
+        "rate_limit_enabled": {
+          "type": "boolean",
+          "description": "속도 제한 활성화 여부",
+          "default": true
+        },
+        "rate_limit_requests": {
+          "type": "integer",
+          "description": "속도 제한 요청 수",
+          "default": 100
+        },
+        "rate_limit_period_seconds": {
+          "type": "integer",
+          "description": "속도 제한 기간 (초)",
+          "default": 60
+        }
+      }
+    },
+    "stock": {
+      "type": "object",
+      "description": "주식 데이터 설정",
+      "properties": {
+        "default_period": {
+          "type": "string",
+          "description": "기본 기간",
+          "default": "1y"
+        },
+        "default_interval": {
+          "type": "string",
+          "description": "기본 간격",
+          "default": "1d"
+        },
+        "technical_indicators": {
+          "type": "array",
+          "description": "기술적 지표 목록",
+          "items": {
+            "type": "string"
+          },
+          "default": ["sma", "ema", "rsi", "macd", "bollinger_bands"]
+        },
+        "moving_averages": {
+          "type": "array",
+          "description": "이동 평균 기간 목록",
+          "items": {
+            "type": "integer"
+          },
+          "default": [20, 50, 200]
+        },
+        "polygon_api_key": {
+          "type": "string",
+          "description": "Polygon API 키"
+        },
+        "alpha_vantage_api_key": {
+          "type": "string",
+          "description": "Alpha Vantage API 키"
+        },
+        "finnhub_api_key": {
+          "type": "string",
+          "description": "Finnhub API 키"
+        }
+      }
+    },
+    "gdelt": {
+      "type": "object",
+      "description": "GDELT 설정",
+      "properties": {
+        "api_base_url": {
+          "type": "string",
+          "description": "API 기본 URL",
+          "default": "https://api.gdeltproject.org/api/v2/"
+        },
+        "doc_api_url": {
+          "type": "string",
+          "description": "문서 API URL",
+          "default": "doc/doc"
+        },
+        "gkg_api_url": {
+          "type": "string",
+          "description": "GKG API URL",
+          "default": "gkg/gkg"
+        },
+        "events_api_url": {
+          "type": "string",
+          "description": "이벤트 API URL",
+          "default": "events/events"
+        },
+        "request_interval": {
+          "type": "number",
+          "description": "요청 간격 (초)",
+          "default": 1.0
+        },
+        "max_records": {
+          "type": "integer",
+          "description": "최대 레코드 수",
+          "default": 250
+        },
+        "company_mapping_file": {
+          "type": "string",
+          "description": "회사 매핑 파일 경로",
+          "default": "data/company_mapping.json"
+        }
+      }
+    }
+  }
+}
