@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from dependency_injector.wiring import inject, Provide
 
 from ..auth.auth_middleware import get_current_user
 import sys
@@ -17,6 +18,7 @@ import os
 # 프로젝트 루트 디렉토리를 sys.path에 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
+from core import container
 from crawling.integrated_news_collector import IntegratedNewsCollector
 
 router = APIRouter(
@@ -24,9 +26,6 @@ router = APIRouter(
     tags=["news"],
     responses={404: {"description": "Not found"}},
 )
-
-# 뉴스 수집기 초기화
-news_collector = IntegratedNewsCollector()
 
 # 모델 정의
 class NewsSearchParams(BaseModel):
@@ -49,12 +48,14 @@ class NewsCollectionParams(BaseModel):
 
 # API 엔드포인트
 @router.get("/search")
+@inject
 async def search_news(
     query: str = Query(..., description="검색어"),
     days: int = Query(30, description="검색 기간 (일)"),
     limit: int = Query(50, description="최대 검색 결과 수"),
     force_update: bool = Query(False, description="강제 업데이트 여부"),
-    current_user: Dict[str, Any] = Depends(get_current_user)
+    current_user: Dict[str, Any] = Depends(get_current_user),
+    news_collector: IntegratedNewsCollector = Depends(Provide[container.news_crawler])
 ):
     """
     키워드로 뉴스 검색
@@ -71,12 +72,14 @@ async def search_news(
         raise HTTPException(status_code=500, detail=f"뉴스 검색 중 오류 발생: {str(e)}")
 
 @router.get("/symbol/{symbol}")
+@inject
 async def get_news_by_symbol(
     symbol: str,
     days: int = Query(7, description="검색 기간 (일)"),
     limit: int = Query(50, description="최대 검색 결과 수"),
     force_update: bool = Query(False, description="강제 업데이트 여부"),
-    current_user: Dict[str, Any] = Depends(get_current_user)
+    current_user: Dict[str, Any] = Depends(get_current_user),
+    news_collector: IntegratedNewsCollector = Depends(Provide[container.news_crawler])
 ):
     """
     특정 주식 심볼에 대한 뉴스 조회
@@ -93,9 +96,11 @@ async def get_news_by_symbol(
         raise HTTPException(status_code=500, detail=f"뉴스 조회 중 오류 발생: {str(e)}")
 
 @router.post("/collect")
+@inject
 async def collect_news(
     params: NewsCollectionParams,
-    current_user: Dict[str, Any] = Depends(get_current_user)
+    current_user: Dict[str, Any] = Depends(get_current_user),
+    news_collector: IntegratedNewsCollector = Depends(Provide[container.news_crawler])
 ):
     """
     뉴스 수집 실행
@@ -116,11 +121,13 @@ async def collect_news(
         raise HTTPException(status_code=500, detail=f"뉴스 수집 중 오류 발생: {str(e)}")
 
 @router.post("/collect/symbol/{symbol}")
+@inject
 async def collect_news_by_symbol(
     symbol: str,
     days: int = Query(7, description="검색 기간 (일)"),
     limit: int = Query(50, description="최대 검색 결과 수"),
-    current_user: Dict[str, Any] = Depends(get_current_user)
+    current_user: Dict[str, Any] = Depends(get_current_user),
+    news_collector: IntegratedNewsCollector = Depends(Provide[container.news_crawler])
 ):
     """
     특정 주식 심볼에 대한 뉴스 수집
@@ -140,8 +147,10 @@ async def collect_news_by_symbol(
         raise HTTPException(status_code=500, detail=f"뉴스 수집 중 오류 발생: {str(e)}")
 
 @router.get("/sources")
+@inject
 async def get_news_sources(
-    current_user: Dict[str, Any] = Depends(get_current_user)
+    current_user: Dict[str, Any] = Depends(get_current_user),
+    news_collector: IntegratedNewsCollector = Depends(Provide[container.news_crawler])
 ):
     """
     뉴스 소스 목록 조회
@@ -152,8 +161,3 @@ async def get_news_sources(
         {"id": "gdelt", "name": "GDELT", "description": "GDELT 글로벌 뉴스 데이터베이스에서 수집한 뉴스"}
     ]
     return {"sources": sources}
-
-# 서버 종료 시 연결 종료
-@router.on_event("shutdown")
-def shutdown_event():
-    news_collector.close()

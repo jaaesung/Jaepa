@@ -4,27 +4,55 @@ JaePa 백엔드 애플리케이션 메인 모듈
 FastAPI 애플리케이션 초기화 및 API 라우트 설정을 담당합니다.
 """
 import os
+import sys
+import logging
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
-from pymongo import MongoClient
+from dependency_injector.wiring import inject, Provide
+
+# 프로젝트 루트 디렉토리를 sys.path에 추가
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
+# 설정 및 의존성 주입 컨테이너 가져오기
+from config import settings
+from core import container
+from bootstrap import bootstrap_app
+
+# 애플리케이션 부트스트랩
+bootstrap_app()
+
+# 로깅 설정
+logging.basicConfig(level=getattr(logging, settings.logging.level))
+logger = logging.getLogger(__name__)
 
 from .api import auth_routes, user_routes, news_routes, sentiment_analysis_routes
 
-# 환경 변수 로드
-load_dotenv()
+# MongoDB 클라이언트 가져오기
+mongo_client = container.mongodb_client()
+db = mongo_client.get_database(settings.db.mongo_db_name)
 
-# MongoDB 연결
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
-MONGO_DB_NAME = os.getenv("MONGO_DB_NAME", "jaepa")
-mongo_client = MongoClient(MONGO_URI)
-db = mongo_client[MONGO_DB_NAME]
+# 애플리케이션 시작/종료 이벤트
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """애플리케이션 생명 주기 관리"""
+    # 시작 이벤트
+    logger.info("JaePa API 서버 시작됨")
+
+    yield
+
+    # 종료 이벤트
+    if mongo_client:
+        mongo_client.close()
+    logger.info("JaePa API 서버 종료됨")
 
 # FastAPI 애플리케이션 생성
 app = FastAPI(
     title="JaePa API",
     description="금융 뉴스 크롤링 및 감성 분석 API",
-    version="0.1.0"
+    version="0.1.0",
+    lifespan=lifespan
 )
 
 # CORS 설정
@@ -60,19 +88,7 @@ async def health_check():
     }
 
 
-# 애플리케이션 시작/종료 이벤트
-@app.on_event("startup")
-async def startup_event():
-    """서버 시작 시 실행되는 코드"""
-    print("JaePa API 서버 시작됨")
 
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """서버 종료 시 실행되는 코드"""
-    if mongo_client:
-        mongo_client.close()
-    print("JaePa API 서버 종료됨")
 
 
 if __name__ == "__main__":
