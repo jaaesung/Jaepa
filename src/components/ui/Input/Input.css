@@ -1,0 +1,117 @@
+/* 입력 필드 컨테이너 */
+.jaepa-input-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+/* 전체 너비 */
+.jaepa-input--full-width {
+  width: 100%;
+}
+
+/* 라벨 */
+.jaepa-input-label {
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+/* 입력 필드 래퍼 */
+.jaepa-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* 기본 입력 필드 */
+.jaepa-input {
+  font-family: var(--font-family);
+  font-size: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  transition: all 0.2s ease-in-out;
+  width: 100%;
+  outline: none;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+}
+
+/* 입력 필드 변형 */
+.jaepa-input--outlined {
+  border: 1px solid var(--border-color);
+  background-color: transparent;
+}
+
+.jaepa-input--outlined:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.jaepa-input--filled {
+  border: none;
+  background-color: var(--bg-light);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.jaepa-input--filled:focus {
+  background-color: var(--bg-light-hover);
+  border-bottom-color: var(--primary-color);
+}
+
+.jaepa-input--standard {
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.jaepa-input--standard:focus {
+  border-bottom-color: var(--primary-color);
+}
+
+/* 에러 상태 */
+.jaepa-input--error {
+  border-color: var(--danger-color) !important;
+}
+
+.jaepa-input--error:focus {
+  box-shadow: 0 0 0 1px var(--danger-color) !important;
+}
+
+/* 아이콘이 있는 입력 필드 */
+.jaepa-input--has-icon {
+  padding-left: 2.5rem;
+}
+
+.jaepa-input-icon {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.jaepa-input-icon--left {
+  left: 0.75rem;
+}
+
+.jaepa-input-icon--right {
+  right: 0.75rem;
+}
+
+/* 도움말 및 에러 텍스트 */
+.jaepa-input-text {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.jaepa-input-helper-text {
+  color: var(--text-secondary);
+}
+
+.jaepa-input-error-text {
+  color: var(--danger-color);
+}

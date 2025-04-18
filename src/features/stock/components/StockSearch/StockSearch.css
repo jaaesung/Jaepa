@@ -1,0 +1,148 @@
+/* 주식 검색 */
+.stock-search {
+  position: relative;
+  width: 100%;
+}
+
+/* 주식 검색 폼 */
+.stock-search-form {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* 주식 검색 입력 필드 */
+.stock-search-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  transition: border-color 0.2s ease;
+}
+
+.stock-search-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+/* 주식 검색 버튼 */
+.stock-search-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.75rem;
+  color: var(--text-secondary);
+  margin-left: -40px;
+}
+
+.stock-search-button:hover {
+  color: var(--text-color);
+}
+
+/* 주식 검색 결과 */
+.stock-search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: var(--card-bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  box-shadow: var(--shadow-md);
+  z-index: 10;
+  margin-top: 0.5rem;
+}
+
+/* 주식 검색 로딩 */
+.stock-search-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  color: var(--text-secondary);
+  gap: 0.5rem;
+}
+
+.spinner-small {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 주식 검색 결과 없음 */
+.stock-search-empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+/* 주식 검색 결과 목록 */
+.stock-search-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* 주식 검색 결과 항목 */
+.stock-search-item {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.stock-search-item:last-child {
+  border-bottom: none;
+}
+
+.stock-search-item-button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s ease;
+}
+
+.stock-search-item-button:hover {
+  background-color: var(--bg-light);
+}
+
+.stock-search-item-symbol {
+  font-weight: 600;
+  color: var(--text-color);
+  margin-right: 1rem;
+  min-width: 60px;
+}
+
+.stock-search-item-name {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 1rem;
+}
+
+.stock-search-item-exchange {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}

@@ -1,0 +1,121 @@
+/* 토스트 */
+.toast {
+  display: flex;
+  align-items: flex-start;
+  padding: 1rem;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 0.75rem;
+  width: 100%;
+  max-width: 400px;
+  animation: toastSlideIn 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 토스트 타입 */
+.toast--info {
+  background-color: var(--bg-color);
+  border-left: 4px solid var(--primary-color);
+}
+
+.toast--info .toast-icon {
+  color: var(--primary-color);
+}
+
+.toast--success {
+  background-color: var(--bg-color);
+  border-left: 4px solid var(--success-color);
+}
+
+.toast--success .toast-icon {
+  color: var(--success-color);
+}
+
+.toast--warning {
+  background-color: var(--bg-color);
+  border-left: 4px solid var(--warning-color);
+}
+
+.toast--warning .toast-icon {
+  color: var(--warning-color);
+}
+
+.toast--error {
+  background-color: var(--bg-color);
+  border-left: 4px solid var(--danger-color);
+}
+
+.toast--error .toast-icon {
+  color: var(--danger-color);
+}
+
+/* 토스트 아이콘 */
+.toast-icon {
+  margin-right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* 토스트 콘텐츠 */
+.toast-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 토스트 제목 */
+.toast-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+  color: var(--text-color);
+}
+
+/* 토스트 메시지 */
+.toast-message {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  word-break: break-word;
+}
+
+/* 토스트 닫기 버튼 */
+.toast-close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+  margin: -0.25rem 0 0 0.5rem;
+  transition: color 0.2s ease;
+}
+
+.toast-close:hover {
+  color: var(--text-color);
+}
+
+/* 토스트 애니메이션 */
+@keyframes toastSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}

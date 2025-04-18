@@ -1,0 +1,104 @@
+/* 뉴스 카드 */
+.news-card {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.news-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* 뉴스 카드 헤더 */
+.news-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.news-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+  line-height: 1.4;
+  flex: 1;
+}
+
+/* 뉴스 카드 감성 */
+.news-card-sentiment {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.sentiment-positive {
+  background-color: rgba(52, 168, 83, 0.1);
+  color: var(--success-color);
+}
+
+.sentiment-neutral {
+  background-color: rgba(251, 188, 4, 0.1);
+  color: var(--warning-color);
+}
+
+.sentiment-negative {
+  background-color: rgba(234, 67, 53, 0.1);
+  color: var(--danger-color);
+}
+
+/* 뉴스 카드 내용 */
+.news-card-content {
+  flex: 1;
+  margin-bottom: 1rem;
+}
+
+.news-card-summary {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* 뉴스 카드 푸터 */
+.news-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.news-card-source {
+  font-weight: 500;
+}
+
+/* 뉴스 카드 키워드 */
+.news-card-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.news-card-keyword {
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  background-color: rgba(26, 115, 232, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .news-card-title {
+    font-size: 1rem;
+  }
+}

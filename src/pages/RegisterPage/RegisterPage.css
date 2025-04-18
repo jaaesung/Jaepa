@@ -1,0 +1,85 @@
+/* 회원가입 페이지 */
+.register-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 회원가입 콘텐츠 */
+.register-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  background-color: var(--bg-light);
+}
+
+/* 회원가입 컨테이너 */
+.register-container {
+  width: 100%;
+  max-width: 480px;
+}
+
+/* 회원가입 카드 */
+.register-card {
+  background-color: var(--card-bg-color);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+/* 회원가입 헤더 */
+.register-header {
+  padding: 2rem 2rem 1rem;
+  text-align: center;
+}
+
+.register-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.register-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* 회원가입 푸터 */
+.register-footer {
+  padding: 1.5rem 2rem 2rem;
+  text-align: center;
+  border-top: 1px solid var(--border-color);
+}
+
+.register-footer-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.register-footer-link {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.register-footer-link:hover {
+  text-decoration: underline;
+}
+
+/* 반응형 */
+@media (max-width: 576px) {
+  .register-content {
+    padding: 2rem 1rem;
+  }
+  
+  .register-header {
+    padding: 1.5rem 1.5rem 1rem;
+  }
+  
+  .register-footer {
+    padding: 1rem 1.5rem 1.5rem;
+  }
+}

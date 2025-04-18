@@ -1,0 +1,132 @@
+/* 사이드바 */
+.sidebar {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  bottom: 0;
+  width: 250px;
+  background-color: var(--card-bg-color);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+  z-index: 90;
+  overflow-y: auto;
+}
+
+/* 사이드바 상태 */
+.sidebar.closed {
+  transform: translateX(-100%);
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+/* 사이드바 헤더 */
+.sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* 사이드바 사용자 정보 */
+.sidebar-user {
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  margin-right: 0.75rem;
+}
+
+.sidebar-user-info {
+  overflow: hidden;
+}
+
+.sidebar-user-name {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-color);
+}
+
+.sidebar-user-email {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 사이드바 네비게이션 */
+.sidebar-nav {
+  flex: 1;
+  padding: 1.5rem 0;
+}
+
+.sidebar-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-nav-item {
+  margin-bottom: 0.25rem;
+}
+
+.sidebar-nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  color: var(--text-color);
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+  border-radius: 0 24px 24px 0;
+}
+
+.sidebar-nav-link:hover {
+  background-color: var(--bg-light);
+}
+
+.sidebar-nav-link.active {
+  background-color: var(--bg-light);
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.sidebar-nav-icon {
+  margin-right: 0.75rem;
+  font-size: 1.25rem;
+  width: 24px;
+  text-align: center;
+}
+
+.sidebar-nav-text {
+  font-size: 0.875rem;
+}
+
+/* 사이드바 푸터 */
+.sidebar-footer {
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--border-color);
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .sidebar {
+    box-shadow: var(--shadow-lg);
+  }
+}

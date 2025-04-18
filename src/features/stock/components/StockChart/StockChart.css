@@ -1,0 +1,180 @@
+/* 주식 차트 */
+.stock-chart {
+  width: 100%;
+}
+
+/* 주식 차트 헤더 */
+.stock-chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.stock-chart-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stock-chart-title h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.stock-chart-price {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+/* 기간 선택 버튼 */
+.stock-chart-periods {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.period-button {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.period-button:hover {
+  background-color: var(--bg-light);
+}
+
+.period-button.active {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+/* 주식 차트 콘텐츠 */
+.stock-chart-content {
+  position: relative;
+  width: 100%;
+  min-height: 300px;
+}
+
+/* 로딩 상태 */
+.stock-chart-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 오류 상태 */
+.stock-chart-error {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--danger-color);
+  text-align: center;
+  padding: 1rem;
+}
+
+/* 빈 상태 */
+.stock-chart-empty {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 1rem;
+}
+
+/* 차트 시각화 */
+.stock-chart-visualization {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 차트 컨테이너 */
+.stock-chart-container {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  padding-bottom: 2rem;
+}
+
+/* 차트 레이블 */
+.stock-chart-labels {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2rem;
+}
+
+.stock-chart-label {
+  position: absolute;
+  bottom: 0;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .stock-chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .stock-chart-periods {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .period-button {
+    flex: 1;
+    text-align: center;
+  }
+}

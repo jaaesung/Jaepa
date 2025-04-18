@@ -1,0 +1,116 @@
+/* 뉴스 분석 페이지 */
+.news-analysis-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 뉴스 분석 헤더 */
+.news-analysis-header {
+  margin-bottom: 2rem;
+}
+
+.news-analysis-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.news-analysis-description {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+/* 뉴스 분석 콘텐츠 */
+.news-analysis-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+/* 뉴스 분석 메인 */
+.news-analysis-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* 뉴스 분석 사이드바 */
+.news-analysis-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* 뉴스 분석 트렌드 카드 */
+.news-analysis-trend-card {
+  padding: 1.5rem;
+}
+
+.news-analysis-trend-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--text-color);
+}
+
+/* 뉴스 분석 정보 카드 */
+.news-analysis-info-card {
+  padding: 1.5rem;
+}
+
+.news-analysis-info-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.news-analysis-info-text {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  margin-bottom: 1.5rem;
+}
+
+.news-analysis-info-subtitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--text-color);
+}
+
+.news-analysis-info-list {
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.news-analysis-info-list li {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+/* 반응형 */
+@media (max-width: 992px) {
+  .news-analysis-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .news-analysis-sidebar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .news-analysis-title {
+    font-size: 1.5rem;
+  }
+  
+  .news-analysis-trend-card,
+  .news-analysis-info-card {
+    padding: 1.25rem;
+  }
+}

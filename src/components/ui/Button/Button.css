@@ -1,0 +1,131 @@
+/* 버튼 기본 스타일 */
+.jaepa-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  outline: none;
+  border: none;
+  position: relative;
+  font-family: var(--font-family);
+}
+
+/* 버튼 크기 */
+.jaepa-button--small {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.jaepa-button--medium {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+}
+
+.jaepa-button--large {
+  padding: 1rem 2rem;
+  font-size: 1.125rem;
+}
+
+/* 버튼 변형 */
+.jaepa-button--primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.jaepa-button--primary:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.jaepa-button--secondary {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+}
+
+.jaepa-button--secondary:hover:not(:disabled) {
+  background-color: var(--secondary-hover);
+}
+
+.jaepa-button--outline {
+  background-color: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.jaepa-button--outline:hover:not(:disabled) {
+  background-color: rgba(26, 115, 232, 0.05);
+}
+
+.jaepa-button--text {
+  background-color: transparent;
+  color: var(--primary-color);
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.jaepa-button--text:hover:not(:disabled) {
+  background-color: rgba(26, 115, 232, 0.05);
+}
+
+.jaepa-button--danger {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.jaepa-button--danger:hover:not(:disabled) {
+  background-color: var(--danger-hover);
+}
+
+/* 전체 너비 */
+.jaepa-button--full-width {
+  width: 100%;
+}
+
+/* 비활성화 상태 */
+.jaepa-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 로딩 상태 */
+.jaepa-button--loading {
+  cursor: wait;
+}
+
+.button-spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 아이콘 */
+.button-icon {
+  display: flex;
+  align-items: center;
+}
+
+.button-icon--left {
+  margin-right: 0.5rem;
+}
+
+.button-icon--right {
+  margin-left: 0.5rem;
+}
+
+/* 버튼 텍스트 */
+.button-text {
+  display: inline-block;
+}

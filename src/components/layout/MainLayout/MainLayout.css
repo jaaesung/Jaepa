@@ -1,0 +1,35 @@
+/* 메인 레이아웃 */
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 메인 콘텐츠 */
+.main-content {
+  display: flex;
+  flex: 1;
+}
+
+/* 콘텐츠 영역 */
+.content {
+  flex: 1;
+  padding: 2rem;
+  transition: margin-left 0.3s ease;
+}
+
+/* 사이드바가 있는 콘텐츠 */
+.content.with-sidebar {
+  margin-left: 250px;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .content.with-sidebar {
+    margin-left: 0;
+  }
+  
+  .content {
+    padding: 1.5rem;
+  }
+}

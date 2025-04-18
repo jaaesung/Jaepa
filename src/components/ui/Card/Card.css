@@ -1,0 +1,82 @@
+/* 카드 기본 스타일 */
+.jaepa-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card-bg-color);
+  transition: all 0.2s ease-in-out;
+}
+
+/* 카드 변형 */
+.jaepa-card--elevated {
+  box-shadow: var(--shadow-md);
+}
+
+.jaepa-card--outlined {
+  border: 1px solid var(--border-color);
+}
+
+.jaepa-card--filled {
+  background-color: var(--bg-light);
+}
+
+/* 패딩 */
+.jaepa-card--padding-small {
+  padding: 0.75rem;
+}
+
+.jaepa-card--padding-medium {
+  padding: 1.25rem;
+}
+
+.jaepa-card--padding-large {
+  padding: 2rem;
+}
+
+/* 테두리 반경 */
+.jaepa-card--radius-small {
+  border-radius: 4px;
+}
+
+.jaepa-card--radius-medium {
+  border-radius: 8px;
+}
+
+.jaepa-card--radius-large {
+  border-radius: 16px;
+}
+
+/* 그림자 */
+.jaepa-card--shadow-small {
+  box-shadow: var(--shadow-sm);
+}
+
+.jaepa-card--shadow-medium {
+  box-shadow: var(--shadow-md);
+}
+
+.jaepa-card--shadow-large {
+  box-shadow: var(--shadow-lg);
+}
+
+/* 테두리 */
+.jaepa-card--bordered {
+  border: 1px solid var(--border-color);
+}
+
+/* 전체 너비 */
+.jaepa-card--full-width {
+  width: 100%;
+}
+
+/* 호버 효과 */
+.jaepa-card--elevated:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.jaepa-card--outlined:hover {
+  border-color: var(--primary-color);
+}
+
+.jaepa-card--filled:hover {
+  background-color: var(--bg-light-hover);
+}

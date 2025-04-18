@@ -1,0 +1,255 @@
+/**
+ * 전역 스타일
+ */
+
+/* 웹 폰트 가져오기 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Roboto:wght@300;400;500;700&display=swap');
+
+/* 기본 스타일 초기화 */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 루트 변수 */
+:root {
+  /* 색상 */
+  --primary-color: #1a73e8;
+  --primary-hover: #1557b0;
+  --secondary-color: #f1f3f4;
+  --secondary-hover: #e8eaed;
+  --danger-color: #ea4335;
+  --danger-hover: #d93025;
+  --success-color: #34a853;
+  --success-hover: #2d9249;
+  --warning-color: #fbbc04;
+  --warning-hover: #f29900;
+  --text-color: #202124;
+  --text-secondary: #5f6368;
+  --border-color: #dadce0;
+  --bg-light: #f1f3f4;
+  --bg-light-hover: #e8eaed;
+  
+  /* 폰트 */
+  --font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+  
+  /* 간격 */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  
+  /* 그림자 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.1);
+  
+  /* 테마 */
+  --bg-color: #ffffff;
+  --card-bg-color: #ffffff;
+}
+
+/* 다크 테마 */
+.dark {
+  --primary-color: #8ab4f8;
+  --primary-hover: #aecbfa;
+  --secondary-color: #3c4043;
+  --secondary-hover: #4a4d51;
+  --text-color: #e8eaed;
+  --text-secondary: #9aa0a6;
+  --border-color: #5f6368;
+  --bg-light: #3c4043;
+  --bg-light-hover: #4a4d51;
+  --bg-color: #202124;
+  --card-bg-color: #2d2e31;
+}
+
+/* 기본 스타일 */
+body {
+  font-family: var(--font-family);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  transition: background-color 0.3s ease;
+}
+
+/* 앱 컨테이너 */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 링크 스타일 */
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* 버튼 스타일 */
+button {
+  cursor: pointer;
+  font-family: var(--font-family);
+}
+
+/* 입력 필드 스타일 */
+input, textarea, select {
+  font-family: var(--font-family);
+}
+
+/* 컨테이너 */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+/* 섹션 */
+.section {
+  padding: var(--spacing-xl) 0;
+}
+
+/* 카드 */
+.card {
+  background-color: var(--card-bg-color);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-lg);
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* 그리드 */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+/* 플렉스 */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-sm {
+  gap: var(--spacing-sm);
+}
+
+.gap-md {
+  gap: var(--spacing-md);
+}
+
+.gap-lg {
+  gap: var(--spacing-lg);
+}
+
+/* 마진 */
+.mt-sm {
+  margin-top: var(--spacing-sm);
+}
+
+.mt-md {
+  margin-top: var(--spacing-md);
+}
+
+.mt-lg {
+  margin-top: var(--spacing-lg);
+}
+
+.mb-sm {
+  margin-bottom: var(--spacing-sm);
+}
+
+.mb-md {
+  margin-bottom: var(--spacing-md);
+}
+
+.mb-lg {
+  margin-bottom: var(--spacing-lg);
+}
+
+/* 패딩 */
+.p-sm {
+  padding: var(--spacing-sm);
+}
+
+.p-md {
+  padding: var(--spacing-md);
+}
+
+.p-lg {
+  padding: var(--spacing-lg);
+}
+
+/* 텍스트 */
+.text-center {
+  text-align: center;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-primary {
+  color: var(--primary-color);
+}
+
+.text-danger {
+  color: var(--danger-color);
+}
+
+.text-success {
+  color: var(--success-color);
+}
+
+.text-warning {
+  color: var(--warning-color);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}

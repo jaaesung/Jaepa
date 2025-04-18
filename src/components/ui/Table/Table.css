@@ -1,0 +1,146 @@
+/* 테이블 컨테이너 */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  position: relative;
+}
+
+/* 테이블 */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 0.875rem;
+  color: var(--text-color);
+}
+
+/* 테이블 헤더 */
+.table-header {
+  background-color: var(--bg-light);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table-header-cell {
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  background-color: var(--bg-light);
+  z-index: 1;
+}
+
+.table-header-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.table-sort-icon {
+  display: flex;
+  align-items: center;
+  color: var(--text-secondary);
+}
+
+/* 테이블 셀 */
+.table-cell {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* 테이블 정렬 */
+.table-cell--left {
+  text-align: left;
+}
+
+.table-cell--center {
+  text-align: center;
+}
+
+.table-cell--right {
+  text-align: right;
+}
+
+/* 테이블 행 */
+.table-row {
+  transition: background-color 0.2s ease;
+}
+
+.table-row--clickable {
+  cursor: pointer;
+}
+
+/* 테이블 스트라이프 */
+.table--striped .table-row:nth-child(even) {
+  background-color: var(--bg-light);
+}
+
+/* 테이블 호버 */
+.table--hoverable .table-row:hover {
+  background-color: rgba(26, 115, 232, 0.05);
+}
+
+/* 테이블 테두리 */
+.table--bordered {
+  border: 1px solid var(--border-color);
+}
+
+.table--bordered .table-cell,
+.table--bordered .table-header-cell {
+  border: 1px solid var(--border-color);
+}
+
+/* 테이블 컴팩트 */
+.table--compact .table-cell,
+.table--compact .table-header-cell {
+  padding: 0.5rem 0.75rem;
+}
+
+/* 테이블 빈 상태 */
+.table-empty-cell {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+/* 테이블 로딩 */
+.table-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+}
+
+.table-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 테이블 에러 */
+.table-error {
+  padding: 2rem;
+  text-align: center;
+  color: var(--danger-color);
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .table-header-cell,
+  .table-cell {
+    padding: 0.625rem 0.75rem;
+  }
+}
