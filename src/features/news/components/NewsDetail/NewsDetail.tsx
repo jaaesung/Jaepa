@@ -1,6 +1,6 @@
 /**
  * 뉴스 상세 컴포넌트
- * 
+ *
  * 뉴스 기사의 상세 정보를 표시하는 컴포넌트를 제공합니다.
  */
 
@@ -43,7 +43,7 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ article, onClose }) => {
     if (!article.sentiment) return null;
 
     const { label, score, scores, positive, neutral, negative } = article.sentiment;
-    
+
     return {
       text: article.title,
       label: label || 'neutral',
@@ -55,7 +55,7 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ article, onClose }) => {
       },
       model: 'FinBERT',
       language: 'en',
-      timestamp: article.publishedDate,
+      timestamp: article.publishedDate || article.publishedAt,
     };
   };
 
@@ -72,7 +72,9 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ article, onClose }) => {
 
       <div className="news-detail-meta">
         <div className="news-detail-source">{article.source}</div>
-        <div className="news-detail-date">{formatDate(article.publishedDate)}</div>
+        <div className="news-detail-date">
+          {formatDate(article.publishedDate || article.publishedAt)}
+        </div>
       </div>
 
       <div className="news-detail-content">

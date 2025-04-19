@@ -4,8 +4,8 @@
  * 감성 분석 관련 기능을 쉽게 사용할 수 있는 커스텀 훅을 제공합니다.
  */
 
-import { useCallback } from "react";
-import { useAppDispatch, useAppSelector } from "../../../core/hooks";
+import { useCallback } from 'react';
+import { useAppDispatch, useAppSelector } from '../../../core/hooks';
 import {
   analyzeSentiment,
   analyzeArticleSentiment,
@@ -17,8 +17,8 @@ import {
   submitSentimentFeedback,
   analyzeBatchSentiment,
   clearSentimentResults,
-} from "../store/sentimentSlice";
-import { SentimentAnalysisParams } from "../types";
+} from '../store/sentimentSlice';
+import { SentimentAnalysisParams } from '../types';
 
 /**
  * 감성 분석 관련 기능을 제공하는 커스텀 훅
@@ -47,7 +47,7 @@ export const useSentiment = () => {
     feedbackSuccess,
     feedbackLoading,
     feedbackError,
-  } = useAppSelector((state) => state.sentimentAnalysis);
+  } = useAppSelector(state => state.sentimentAnalysis);
 
   // 텍스트 감성 분석
   const analyzeText = useCallback(
@@ -69,13 +69,8 @@ export const useSentiment = () => {
 
   // 키워드 감성 분석
   const analyzeKeyword = useCallback(
-    async (
-      keyword: string,
-      params: { startDate?: string; endDate?: string } = {}
-    ) => {
-      const resultAction = await dispatch(
-        analyzeKeywordSentiment({ keyword, ...params })
-      );
+    async (keyword: string, params: { startDate?: string; endDate?: string } = {}) => {
+      const resultAction = await dispatch(analyzeKeywordSentiment({ keyword, ...params }));
       return analyzeKeywordSentiment.fulfilled.match(resultAction);
     },
     [dispatch]
@@ -102,7 +97,7 @@ export const useSentiment = () => {
       params: {
         startDate?: string;
         endDate?: string;
-        interval?: "day" | "week" | "month";
+        interval?: 'day' | 'week' | 'month';
       } = {}
     ) => {
       const resultAction = await dispatch(fetchSentimentTrend(params));
@@ -118,12 +113,10 @@ export const useSentiment = () => {
       params: {
         startDate?: string;
         endDate?: string;
-        interval?: "day" | "week" | "month";
+        interval?: 'day' | 'week' | 'month';
       } = {}
     ) => {
-      const resultAction = await dispatch(
-        fetchStockSentimentTrend({ symbol, ...params })
-      );
+      const resultAction = await dispatch(fetchStockSentimentTrend({ symbol, ...params }));
       return fetchStockSentimentTrend.fulfilled.match(resultAction);
     },
     [dispatch]
@@ -134,12 +127,17 @@ export const useSentiment = () => {
     async (
       analysisId: string,
       feedback: {
-        correctSentiment: "positive" | "neutral" | "negative";
+        correctSentiment: 'positive' | 'neutral' | 'negative';
         comment?: string;
       }
     ) => {
+      const feedbackData = {
+        isCorrect: true,
+        userSentiment: feedback.correctSentiment,
+        comment: feedback.comment,
+      };
       const resultAction = await dispatch(
-        submitSentimentFeedback({ analysisId, feedback })
+        submitSentimentFeedback({ analysisId, feedback: feedbackData })
       );
       return submitSentimentFeedback.fulfilled.match(resultAction);
     },
@@ -148,10 +146,8 @@ export const useSentiment = () => {
 
   // 감성 분석 배치 처리
   const analyzeBatch = useCallback(
-    async (texts: string[], model: string = "finbert") => {
-      const resultAction = await dispatch(
-        analyzeBatchSentiment({ texts, model })
-      );
+    async (texts: string[], model = 'finbert') => {
+      const resultAction = await dispatch(analyzeBatchSentiment({ texts, modelId: model, model }));
       return analyzeBatchSentiment.fulfilled.match(resultAction);
     },
     [dispatch]

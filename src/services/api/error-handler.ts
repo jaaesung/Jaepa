@@ -1,91 +1,87 @@
 /**
- * API 에러 핸들러 모듈
- * 
- * API 요청 중 발생하는 에러를 처리하는 기능을 제공합니다.
+ * API 오류 처리 유틸리티
  */
 
 import { AxiosError } from 'axios';
 
-/**
- * API 에러 타입
- */
-export interface ApiError extends Error {
-  status?: number;
-  data?: any;
-  isApiError: boolean;
+interface ApiError {
+  status: number;
+  message: string;
+  code?: string;
+  details?: Record<string, any>;
 }
 
 /**
- * API 에러 핸들러 클래스
+ * API 오류 처리 함수
+ * 
+ * @param error Axios 오류 객체
+ * @returns 표준화된 API 오류 객체
  */
-class ApiErrorHandler {
-  /**
-   * API 에러 처리
-   * 
-   * @param error Axios 에러
-   * @returns 처리된 에러 또는 거부된 프로미스
-   */
-  handleApiError(error: AxiosError): Promise<never> {
-    if (!error.response) {
-      // 네트워크 에러
-      return Promise.reject(this.createApiError('Network Error', 0));
-    }
+export const errorHandler = (error: AxiosError): ApiError => {
+  let status = 500;
+  let errorMessage = '서버 오류가 발생했습니다.';
+  let errorCode;
+  let errorDetails;
 
-    const { status, data } = error.response;
-    let errorMessage = 'Unknown Error';
+  if (error.response) {
+    // 서버에서 응답을 받았지만 상태 코드가 2xx가 아닌 경우
+    status = error.response.status;
+    const data: any = error.response.data;
 
-    // 에러 메시지 추출
+    // 응답 데이터 형식에 따른 오류 메시지 추출
     if (typeof data === 'string') {
       errorMessage = data;
     } else if (data && typeof data === 'object') {
       errorMessage = data.message || data.error || JSON.stringify(data);
+      errorCode = data.code;
+      errorDetails = data.details;
     }
 
     // 상태 코드별 에러 처리
     switch (status) {
       case 400:
-        return Promise.reject(this.createApiError(`Bad Request: ${errorMessage}`, status, data));
+        if (!errorMessage.includes('유효하지 않은')) {
+          errorMessage = '잘못된 요청입니다. ' + errorMessage;
+        }
+        break;
       case 401:
-        return Promise.reject(this.createApiError(`Unauthorized: ${errorMessage}`, status, data));
+        errorMessage = '인증이 필요합니다. 다시 로그인해주세요.';
+        break;
       case 403:
-        return Promise.reject(this.createApiError(`Forbidden: ${errorMessage}`, status, data));
+        errorMessage = '접근 권한이 없습니다.';
+        break;
       case 404:
-        return Promise.reject(this.createApiError(`Not Found: ${errorMessage}`, status, data));
+        errorMessage = '요청한 리소스를 찾을 수 없습니다.';
+        break;
+      case 409:
+        errorMessage = '데이터 충돌이 발생했습니다. ' + errorMessage;
+        break;
       case 422:
-        return Promise.reject(this.createApiError(`Validation Error: ${errorMessage}`, status, data));
+        errorMessage = '입력 데이터가 유효하지 않습니다. ' + errorMessage;
+        break;
+      case 429:
+        errorMessage = '너무 많은 요청을 보냈습니다. 잠시 후 다시 시도해주세요.';
+        break;
       case 500:
-        return Promise.reject(this.createApiError(`Server Error: ${errorMessage}`, status, data));
-      default:
-        return Promise.reject(this.createApiError(`Error ${status}: ${errorMessage}`, status, data));
+      case 502:
+      case 503:
+      case 504:
+        errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+        break;
     }
+  } else if (error.request) {
+    // 요청은 보냈지만 응답을 받지 못한 경우
+    status = 0;
+    errorMessage = '서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.';
+  } else {
+    // 요청 설정 중에 오류가 발생한 경우
+    errorMessage = '요청을 설정하는 중에 오류가 발생했습니다: ' + error.message;
   }
 
-  /**
-   * API 에러 객체 생성
-   * 
-   * @param message 에러 메시지
-   * @param status HTTP 상태 코드
-   * @param data 에러 데이터
-   * @returns API 에러 객체
-   */
-  createApiError(message: string, status?: number, data?: any): ApiError {
-    const error = new Error(message) as ApiError;
-    error.status = status;
-    error.data = data;
-    error.isApiError = true;
-    return error;
-  }
-
-  /**
-   * API 에러 여부 확인
-   * 
-   * @param error 확인할 에러
-   * @returns API 에러 여부
-   */
-  isApiError(error: any): error is ApiError {
-    return error && error.isApiError === true;
-  }
-}
-
-export const errorHandler = new ApiErrorHandler();
-export default errorHandler;
+  return {
+    status,
+    message: errorMessage,
+    code: errorCode,
+    details: errorDetails
+  };
+};

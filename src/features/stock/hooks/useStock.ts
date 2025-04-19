@@ -4,8 +4,8 @@
  * 주식 관련 기능을 쉽게 사용할 수 있는 커스텀 훅을 제공합니다.
  */
 
-import { useCallback } from "react";
-import { useAppDispatch, useAppSelector } from "../../../core/hooks";
+import { useCallback } from 'react';
+import { useAppDispatch, useAppSelector } from '../../../core/hooks';
 import {
   fetchStockData,
   fetchMultipleStocks,
@@ -22,8 +22,8 @@ import {
   addToWatchlist,
   removeFromWatchlist,
   clearSearchResults,
-} from "../store/stockSlice";
-import { PeriodType } from "../types";
+} from '../store/stockSlice';
+import { PeriodType } from '../types';
 
 /**
  * 주식 관련 기능을 제공하는 커스텀 훅
@@ -58,19 +58,12 @@ export const useStock = () => {
     sectorError,
     indicatorsLoading,
     indicatorsError,
-  } = useAppSelector((state) => state.stock);
+  } = useAppSelector(state => state.stocks);
 
   // 주식 데이터 가져오기
   const getStockData = useCallback(
-    async (
-      symbol: string,
-      period?: PeriodType,
-      startDate?: string,
-      endDate?: string
-    ) => {
-      const resultAction = await dispatch(
-        fetchStockData({ symbol, period, startDate, endDate })
-      );
+    async (symbol: string, period?: PeriodType, startDate?: string, endDate?: string) => {
+      const resultAction = await dispatch(fetchStockData({ symbol, period, startDate, endDate }));
       return fetchStockData.fulfilled.match(resultAction);
     },
     [dispatch]
@@ -78,12 +71,7 @@ export const useStock = () => {
 
   // 여러 주식 데이터 가져오기
   const getMultipleStocks = useCallback(
-    async (
-      symbols: string[],
-      period?: PeriodType,
-      startDate?: string,
-      endDate?: string
-    ) => {
+    async (symbols: string[], period?: PeriodType, startDate?: string, endDate?: string) => {
       const resultAction = await dispatch(
         fetchMultipleStocks({ symbols, period, startDate, endDate })
       );
@@ -113,9 +101,7 @@ export const useStock = () => {
   // 상관관계 데이터 가져오기
   const getCorrelation = useCallback(
     async (symbol: string, sentimentType?: string, period?: PeriodType) => {
-      const resultAction = await dispatch(
-        fetchCorrelation({ symbol, sentimentType, period })
-      );
+      const resultAction = await dispatch(fetchCorrelation({ symbol, sentimentType, period }));
       return fetchCorrelation.fulfilled.match(resultAction);
     },
     [dispatch]
@@ -154,15 +140,14 @@ export const useStock = () => {
 
   // 주식 관련 뉴스 가져오기
   const getStockNews = useCallback(
-    async (
-      symbol: string,
-      limit?: number,
-      startDate?: string,
-      endDate?: string
-    ) => {
-      const resultAction = await dispatch(
-        fetchStockNews({ symbol, limit, startDate, endDate })
-      );
+    async (symbol: string, limit?: number, startDate?: string, endDate?: string) => {
+      const params: { symbol: string; limit?: number; startDate?: string; endDate?: string } = {
+        symbol,
+        limit,
+      };
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
+      const resultAction = await dispatch(fetchStockNews(params));
       return fetchStockNews.fulfilled.match(resultAction);
     },
     [dispatch]
@@ -171,7 +156,7 @@ export const useStock = () => {
   // 주식 재무 정보 가져오기
   const getFinancials = useCallback(
     async (symbol: string) => {
-      const resultAction = await dispatch(fetchFinancials(symbol));
+      const resultAction = await dispatch(fetchFinancials({ symbol }));
       return fetchFinancials.fulfilled.match(resultAction);
     },
     [dispatch]
@@ -180,7 +165,7 @@ export const useStock = () => {
   // 주식 분석 정보 가져오기
   const getAnalysis = useCallback(
     async (symbol: string) => {
-      const resultAction = await dispatch(fetchAnalysis(symbol));
+      const resultAction = await dispatch(fetchAnalysis({ symbol }));
       return fetchAnalysis.fulfilled.match(resultAction);
     },
     [dispatch]
@@ -195,9 +180,7 @@ export const useStock = () => {
   // 주식 기술적 지표 가져오기
   const getTechnicalIndicators = useCallback(
     async (symbol: string, indicators: string[], period?: PeriodType) => {
-      const resultAction = await dispatch(
-        fetchTechnicalIndicators({ symbol, indicators, period })
-      );
+      const resultAction = await dispatch(fetchTechnicalIndicators({ symbol, indicators, period }));
       return fetchTechnicalIndicators.fulfilled.match(resultAction);
     },
     [dispatch]

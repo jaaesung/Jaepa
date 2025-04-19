@@ -29,9 +29,9 @@
     "start": "craco start --config config/frontend/craco.config.js",
     "build": "craco build --config config/frontend/craco.config.js",
     "build:analyze": "ANALYZE=true craco build --config config/frontend/craco.config.js",
-    "test": "jest --config config/frontend/jest.config.js",
-    "test:watch": "jest --config config/frontend/jest.config.js --watch",
-    "test:coverage": "jest --config config/frontend/jest.config.js --coverage",
+    "test": "npx jest --config config/frontend/jest.config.js",
+    "test:custom": "npx jest --config jest.direct.config.js",
+    "test:coverage": "npx jest --config config/frontend/jest.config.js --coverage",
     "eject": "react-scripts eject",
     "lint": "eslint src/**/*.{js,jsx,ts,tsx}",
     "lint:fix": "eslint --fix src/**/*.{js,jsx,ts,tsx}",
@@ -41,7 +41,7 @@
     "docker:build": "docker-compose -f config/docker/docker-compose.yml build",
     "docker:down": "docker-compose -f config/docker/docker-compose.yml down",
     "backend:install": "pip install -r config/backend/requirements.txt",
-    "backend:test": "pytest -c config/backend/pytest.ini"
+    "backend:test": "python -m pytest -c config/backend/pytest.ini"
   },
   "eslintConfig": {
     "extends": [
@@ -68,6 +68,8 @@
     "compression-webpack-plugin": "^10.0.0",
     "eslint": "^8.46.0",
     "eslint-config-prettier": "^8.10.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-react": "^7.33.1",
     "husky": "^8.0.3",
@@ -84,7 +86,8 @@
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx}": [
       "eslint --fix",
-      "prettier --write"
+      "prettier --write",
+      "npm run test:custom -- --findRelatedTests --passWithNoTests"
     ],
     "src/**/*.{css,md,json}": [
       "prettier --write"

@@ -4,8 +4,8 @@
  * 뉴스 관련 기능을 쉽게 사용할 수 있는 커스텀 훅을 제공합니다.
  */
 
-import { useCallback } from "react";
-import { useAppDispatch, useAppSelector } from "../../../core/hooks";
+import { useCallback } from 'react';
+import { useAppDispatch, useAppSelector } from '../../../core/hooks';
 import {
   fetchNews,
   fetchNewsItem,
@@ -16,8 +16,8 @@ import {
   fetchNewsSentimentTrend,
   setSelectedArticle,
   clearSelectedArticle,
-} from "../store/newsSlice";
-import { FetchNewsParams } from "../types";
+} from '../store/newsSlice';
+import { FetchNewsParams, NewsArticle } from '../types';
 
 /**
  * 뉴스 관련 기능을 제공하는 커스텀 훅
@@ -43,7 +43,7 @@ export const useNews = () => {
     keywordsError,
     trendLoading,
     trendError,
-  } = useAppSelector((state) => state.news);
+  } = useAppSelector(state => state.news);
 
   // 뉴스 목록 가져오기
   const getNews = useCallback(
@@ -65,10 +65,8 @@ export const useNews = () => {
 
   // 뉴스 검색하기
   const searchNews = useCallback(
-    async (query: string, params: Omit<FetchNewsParams, "filters"> = {}) => {
-      const resultAction = await dispatch(
-        fetchNewsSearch({ query, ...params })
-      );
+    async (query: string, params: Omit<FetchNewsParams, 'filters'> = {}) => {
+      const resultAction = await dispatch(fetchNewsSearch({ query, ...params }));
       return fetchNewsSearch.fulfilled.match(resultAction);
     },
     [dispatch]
@@ -88,9 +86,7 @@ export const useNews = () => {
 
   // 인기 키워드 가져오기
   const getKeywords = useCallback(
-    async (
-      params: { limit?: number; startDate?: string; endDate?: string } = {}
-    ) => {
+    async (params: { limit?: number; startDate?: string; endDate?: string } = {}) => {
       const resultAction = await dispatch(fetchNewsKeywords(params));
       return fetchNewsKeywords.fulfilled.match(resultAction);
     },
@@ -103,7 +99,7 @@ export const useNews = () => {
       params: {
         startDate?: string;
         endDate?: string;
-        interval?: "day" | "week" | "month";
+        interval?: 'day' | 'week' | 'month';
       } = {}
     ) => {
       const resultAction = await dispatch(fetchNewsSentimentTrend(params));
@@ -114,7 +110,7 @@ export const useNews = () => {
 
   // 선택된 기사 설정
   const selectArticle = useCallback(
-    (article) => {
+    (article: NewsArticle) => {
       dispatch(setSelectedArticle(article));
     },
     [dispatch]

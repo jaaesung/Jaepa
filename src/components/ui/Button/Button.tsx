@@ -17,55 +17,70 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  /**
+   * 스크린 리더에서 읽을 아리아 레이블
+   */
+  ariaLabel?: string;
 }
 
 /**
  * 버튼 컴포넌트
  */
-const Button: React.FC<ButtonProps> = React.memo(({
-  children,
-  variant = 'primary',
-  size = 'medium',
-  isLoading = false,
-  fullWidth = false,
-  leftIcon,
-  rightIcon,
-  className = '',
-  disabled,
-  ...rest
-}) => {
-  // 클래스 이름 계산을 위한 변수들
-  const baseClass = 'jaepa-button';
-  const variantClass = `${baseClass}--${variant}`;
-  const sizeClass = `${baseClass}--${size}`;
-  const fullWidthClass = fullWidth ? `${baseClass}--full-width` : '';
-  const loadingClass = isLoading ? `${baseClass}--loading` : '';
+const Button: React.FC<ButtonProps> = React.memo(
+  ({
+    children,
+    variant = 'primary',
+    size = 'medium',
+    isLoading = false,
+    fullWidth = false,
+    leftIcon,
+    rightIcon,
+    className = '',
+    disabled,
+    ariaLabel,
+    ...rest
+  }) => {
+    // 클래스 이름 계산을 위한 변수들
+    const baseClass = 'jaepa-button';
+    const variantClass = `${baseClass}--${variant}`;
+    const sizeClass = `${baseClass}--${size}`;
+    const fullWidthClass = fullWidth ? `${baseClass}--full-width` : '';
+    const loadingClass = isLoading ? `${baseClass}--loading` : '';
 
-  // useMemo를 사용하여 클래스 이름 계산 최적화
-  const combinedClassName = React.useMemo(() => {
-    return [
-      baseClass,
-      variantClass,
-      sizeClass,
-      fullWidthClass,
-      loadingClass,
-      className
-    ].filter(Boolean).join(' ');
-  }, [baseClass, variantClass, sizeClass, fullWidthClass, loadingClass, className]);
+    // useMemo를 사용하여 클래스 이름 계산 최적화
+    const combinedClassName = React.useMemo(() => {
+      return [baseClass, variantClass, sizeClass, fullWidthClass, loadingClass, className]
+        .filter(Boolean)
+        .join(' ');
+    }, [baseClass, variantClass, sizeClass, fullWidthClass, loadingClass, className]);
 
-  // 버튼 렌더링
-  return (
-    <button
-      className={combinedClassName}
-      disabled={disabled || isLoading}
-      {...rest}
-    >
-      {isLoading && <span className="button-spinner" data-testid="loading-spinner"></span>}
-      {!isLoading && leftIcon && <span className="button-icon button-icon--left">{leftIcon}</span>}
-      <span className="button-text">{children}</span>
-      {!isLoading && rightIcon && <span className="button-icon button-icon--right">{rightIcon}</span>}
-    </button>
-  );
-});
+    // 버튼 렌더링
+    return (
+      <button
+        className={combinedClassName}
+        disabled={disabled || isLoading}
+        aria-label={ariaLabel}
+        aria-busy={isLoading}
+        {...rest}
+      >
+        {isLoading && (
+          <span
+            className="button-spinner"
+            data-testid="loading-spinner"
+            role="status"
+            aria-hidden="true"
+          ></span>
+        )}
+        {!isLoading && leftIcon && (
+          <span className="button-icon button-icon--left">{leftIcon}</span>
+        )}
+        <span className="button-text">{children}</span>
+        {!isLoading && rightIcon && (
+          <span className="button-icon button-icon--right">{rightIcon}</span>
+        )}
+      </button>
+    );
+  }
+);
 
 export default Button;

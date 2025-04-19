@@ -1,10 +1,8 @@
 /**
- * 보호된 라우트 컴포넌트
- * 
- * 인증이 필요한 라우트를 보호하는 컴포넌트를 제공합니다.
+ * 인증 보호 라우트 컴포넌트
  */
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth';
 import { routeConstants } from '../../core/constants';
@@ -15,55 +13,27 @@ interface ProtectedRouteProps {
 }
 
 /**
- * 보호된 라우트 컴포넌트
- * 
- * 인증되지 않은 사용자가 접근하면 로그인 페이지로 리디렉션합니다.
+ * 인증된 사용자만 접근할 수 있는 보호된 라우트
  */
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated, checkAuthStatus } = useAuth();
-  const [isVerifying, setIsVerifying] = useState(true);
-  const [isValid, setIsValid] = useState(false);
+  const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
-  useEffect(() => {
-    const verifyAuth = async () => {
-      try {
-        setIsVerifying(true);
-        const isValid = await checkAuthStatus();
-        setIsValid(isValid);
-      } catch (error) {
-        setIsValid(false);
-      } finally {
-        setIsVerifying(false);
-      }
-    };
-
-    if (isAuthenticated) {
-      verifyAuth();
-    } else {
-      setIsVerifying(false);
-    }
-  }, [isAuthenticated, checkAuthStatus]);
-
-  if (isVerifying) {
+  // 로딩 중이면 로딩 스피너 표시
+  if (isLoading) {
     return (
       <div className="protected-route-loading">
-        <LoadingSpinner size="large" />
+        <LoadingSpinner />
       </div>
     );
   }
 
-  if (!isAuthenticated || !isValid) {
-    // 현재 위치를 state로 전달하여 로그인 후 원래 페이지로 리디렉션할 수 있도록 함
-    return (
-      <Navigate
-        to={routeConstants.ROUTES.LOGIN}
-        state={{ from: location }}
-        replace
-      />
-    );
+  // 인증되지 않았으면 로그인 페이지로 리다이렉트
+  if (!isAuthenticated) {
+    return <Navigate to={routeConstants.LOGIN} state={{ from: location }} replace />;
   }
 
+  // 인증되었으면 자식 컴포넌트 렌더링
   return <>{children}</>;
 };
 

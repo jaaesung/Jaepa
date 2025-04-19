@@ -44,12 +44,12 @@ async def health_check():
         "version": "1.0.0",
     }
 
-# 라우트 등록 (추후 구현)
-# from .routes import auth, news, stock, analysis
-# app.include_router(auth.router, prefix="/auth", tags=["인증"])
-# app.include_router(news.router, prefix="/news", tags=["뉴스"])
-# app.include_router(stock.router, prefix="/stocks", tags=["주식"])
-# app.include_router(analysis.router, prefix="/analysis", tags=["분석"])
+# 라우트 등록
+from backend.api.routes import auth, news, stock, analysis
+app.include_router(auth.router, prefix="/auth", tags=["인증"])
+app.include_router(news.router, prefix="/news", tags=["뉴스"])
+app.include_router(stock.router, prefix="/stocks", tags=["주식"])
+app.include_router(analysis.router, prefix="/analysis", tags=["분석"])
 
 # 전역 예외 처리
 @app.exception_handler(Exception)

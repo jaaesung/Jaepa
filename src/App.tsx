@@ -10,7 +10,7 @@ import { Provider } from "react-redux";
 import store from "@/store";
 import { ThemeProvider, ToastProvider } from "@core/contexts";
 import AppRoutes from "@/routes";
-import { verifyAuth } from "@features/auth/store/authSlice";
+import { verifyAuth } from "./features/auth/store/authSlice";
 import "./App.css";
 
 const App: React.FC = () => {

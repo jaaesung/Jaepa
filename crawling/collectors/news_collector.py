@@ -34,9 +34,33 @@ env_path = Path(__file__).parents[1] / '.env'
 load_dotenv(dotenv_path=env_path)
 
 # 설정 파일 로드
-config_path = Path(__file__).parent / 'config.json'
-with open(config_path, 'r') as f:
-    CONFIG = json.load(f)
+config_path = Path(__file__).parents[1] / 'config' / 'sources.json'
+try:
+    with open(config_path, 'r') as f:
+        CONFIG = json.load(f)
+except FileNotFoundError:
+    logger.error(f"설정 파일을 찾을 수 없습니다: {config_path}")
+    CONFIG = {
+        "news_sources": {},
+        "rss_feeds": {},
+        "request_settings": {
+            "headers": {},
+            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            "proxy": None,
+            "retries": 3,
+            "retry_delay": 1,
+            "timeout": 10
+        },
+        "rate_limits": {},
+        "storage": {
+            "mongodb": {
+                "news_collection": "news"
+            }
+        },
+        "sentiment_analysis": {
+            "batch_size": 8
+        }
+    }
 
 
 class NewsCrawler:

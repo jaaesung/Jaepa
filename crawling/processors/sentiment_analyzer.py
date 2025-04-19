@@ -21,7 +21,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # 환경 변수 로드
-env_path = Path(__file__).parents[1] / '.env'
+env_path = Path(__file__).parents[2] / '.env'
 load_dotenv(dotenv_path=env_path)
 
 

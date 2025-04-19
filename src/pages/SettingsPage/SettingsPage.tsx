@@ -1,6 +1,6 @@
 /**
  * 설정 페이지 컴포넌트
- * 
+ *
  * 사용자 설정 및 프로필 관리를 위한 페이지를 제공합니다.
  */
 
@@ -17,14 +17,14 @@ import './SettingsPage.css';
 const SettingsPage: React.FC = () => {
   const { user, updateProfile, changePassword } = useAuth();
   const { theme, setTheme } = useTheme();
-  
+
   // 프로필 상태
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileSuccess, setProfileSuccess] = useState(false);
   const [profileError, setProfileError] = useState('');
-  
+
   // 비밀번호 상태
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -44,8 +44,8 @@ const SettingsPage: React.FC = () => {
   const handleSaveProfile = async () => {
     try {
       setProfileError('');
-      const success = await updateProfile({ name, email });
-      
+      const success = await updateProfile({ name, email, fullName: name });
+
       if (success) {
         setProfileSuccess(true);
         setIsEditingProfile(false);
@@ -72,18 +72,18 @@ const SettingsPage: React.FC = () => {
       setPasswordError('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
       return;
     }
-    
+
     if (newPassword.length < 8) {
       setPasswordError('비밀번호는 최소 8자 이상이어야 합니다.');
       return;
     }
-    
+
     try {
       setPasswordError('');
       setIsChangingPassword(true);
-      
+
       const success = await changePassword(currentPassword, newPassword);
-      
+
       if (success) {
         setPasswordSuccess(true);
         setCurrentPassword('');
@@ -109,15 +109,13 @@ const SettingsPage: React.FC = () => {
       <div className="settings-page">
         <div className="settings-header">
           <h1 className="settings-title">설정</h1>
-          <p className="settings-description">
-            계정 설정 및 애플리케이션 환경을 관리하세요.
-          </p>
+          <p className="settings-description">계정 설정 및 애플리케이션 환경을 관리하세요.</p>
         </div>
 
         <div className="settings-content">
           <div className="settings-section">
             <h2 className="settings-section-title">프로필 설정</h2>
-            
+
             <Card className="settings-card">
               <div className="settings-card-header">
                 <h3 className="settings-card-title">사용자 정보</h3>
@@ -127,39 +125,35 @@ const SettingsPage: React.FC = () => {
                   </Button>
                 )}
               </div>
-              
+
               {profileSuccess && (
-                <div className="settings-success">
-                  프로필이 성공적으로 업데이트되었습니다.
-                </div>
+                <div className="settings-success">프로필이 성공적으로 업데이트되었습니다.</div>
               )}
-              
-              {profileError && (
-                <div className="settings-error">{profileError}</div>
-              )}
-              
+
+              {profileError && <div className="settings-error">{profileError}</div>}
+
               <div className="settings-form">
                 <div className="settings-form-group">
                   <Input
                     label="이름"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={e => setName(e.target.value)}
                     disabled={!isEditingProfile}
                     fullWidth
                   />
                 </div>
-                
+
                 <div className="settings-form-group">
                   <Input
                     label="이메일"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={e => setEmail(e.target.value)}
                     disabled={!isEditingProfile}
                     fullWidth
                   />
                 </div>
-                
+
                 {isEditingProfile && (
                   <div className="settings-form-actions">
                     <Button variant="outline" onClick={handleCancelProfile}>
@@ -170,61 +164,54 @@ const SettingsPage: React.FC = () => {
                 )}
               </div>
             </Card>
-            
+
             <Card className="settings-card">
               <div className="settings-card-header">
                 <h3 className="settings-card-title">비밀번호 변경</h3>
               </div>
-              
+
               {passwordSuccess && (
-                <div className="settings-success">
-                  비밀번호가 성공적으로 변경되었습니다.
-                </div>
+                <div className="settings-success">비밀번호가 성공적으로 변경되었습니다.</div>
               )}
-              
-              {passwordError && (
-                <div className="settings-error">{passwordError}</div>
-              )}
-              
+
+              {passwordError && <div className="settings-error">{passwordError}</div>}
+
               <div className="settings-form">
                 <div className="settings-form-group">
                   <Input
                     label="현재 비밀번호"
                     type="password"
                     value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    onChange={e => setCurrentPassword(e.target.value)}
                     fullWidth
                   />
                 </div>
-                
+
                 <div className="settings-form-group">
                   <Input
                     label="새 비밀번호"
                     type="password"
                     value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
+                    onChange={e => setNewPassword(e.target.value)}
                     fullWidth
                   />
                 </div>
-                
+
                 <div className="settings-form-group">
                   <Input
                     label="새 비밀번호 확인"
                     type="password"
                     value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onChange={e => setConfirmPassword(e.target.value)}
                     fullWidth
                   />
                 </div>
-                
+
                 <div className="settings-form-actions">
                   <Button
                     onClick={handleChangePassword}
                     disabled={
-                      !currentPassword ||
-                      !newPassword ||
-                      !confirmPassword ||
-                      isChangingPassword
+                      !currentPassword || !newPassword || !confirmPassword || isChangingPassword
                     }
                     isLoading={isChangingPassword}
                   >
@@ -234,15 +221,15 @@ const SettingsPage: React.FC = () => {
               </div>
             </Card>
           </div>
-          
+
           <div className="settings-section">
             <h2 className="settings-section-title">애플리케이션 설정</h2>
-            
+
             <Card className="settings-card">
               <div className="settings-card-header">
                 <h3 className="settings-card-title">테마 설정</h3>
               </div>
-              
+
               <div className="settings-theme">
                 <div
                   className={`theme-option ${theme === 'light' ? 'active' : ''}`}
@@ -254,7 +241,7 @@ const SettingsPage: React.FC = () => {
                   </div>
                   <div className="theme-option-label">라이트 모드</div>
                 </div>
-                
+
                 <div
                   className={`theme-option ${theme === 'dark' ? 'active' : ''}`}
                   onClick={() => handleThemeChange('dark')}

@@ -1,10 +1,10 @@
 /**
  * 뉴스 목록 컴포넌트
- * 
+ *
  * 뉴스 기사 목록을 표시하는 컴포넌트를 제공합니다.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '../../../../components/ui';
 import { useNews } from '../../hooks/useNews';
 import { NewsArticle, FetchNewsParams } from '../../types';
@@ -20,29 +20,36 @@ interface NewsListProps {
  * 뉴스 목록 컴포넌트
  */
 const NewsList: React.FC<NewsListProps> = ({ filters, onSelectArticle }) => {
-  const { getNews, articles, totalItems, currentPage, isLoading, error } = useNews();
+  const { getNews, articles, totalItems, isLoading, error } = useNews();
   const [page, setPage] = useState(1);
   const limit = 10;
 
   // 뉴스 데이터 가져오기
   useEffect(() => {
-    getNews({ page, limit, filters });
+    const params: FetchNewsParams = { page, pageSize: limit };
+    if (filters) {
+      params.filters = filters;
+    }
+    getNews(params);
   }, [getNews, page, limit, filters]);
 
   // 페이지 변경 핸들러
-  const handlePageChange = (newPage: number) => {
+  const handlePageChange = useCallback((newPage: number) => {
     setPage(newPage);
-  };
+  }, []);
 
   // 기사 선택 핸들러
-  const handleSelectArticle = (article: NewsArticle) => {
-    if (onSelectArticle) {
-      onSelectArticle(article);
-    }
-  };
+  const handleSelectArticle = useCallback(
+    (article: NewsArticle) => {
+      if (onSelectArticle) {
+        onSelectArticle(article);
+      }
+    },
+    [onSelectArticle]
+  );
 
   // 총 페이지 수 계산
-  const totalPages = Math.ceil(totalItems / limit);
+  const totalPages = useMemo(() => Math.ceil(totalItems / limit), [totalItems, limit]);
 
   return (
     <div className="news-list">
@@ -54,7 +61,17 @@ const NewsList: React.FC<NewsListProps> = ({ filters, onSelectArticle }) => {
       ) : error ? (
         <div className="news-list-error">
           <p>{error}</p>
-          <Button onClick={() => getNews({ page, limit, filters })}>다시 시도</Button>
+          <Button
+            onClick={() => {
+              const params: FetchNewsParams = { page, pageSize: limit };
+              if (filters) {
+                params.filters = filters;
+              }
+              getNews(params);
+            }}
+          >
+            다시 시도
+          </Button>
         </div>
       ) : articles.length === 0 ? (
         <div className="news-list-empty">
@@ -63,7 +80,7 @@ const NewsList: React.FC<NewsListProps> = ({ filters, onSelectArticle }) => {
       ) : (
         <>
           <div className="news-list-grid">
-            {articles.map((article) => (
+            {articles.map((article: NewsArticle) => (
               <div key={article.id} className="news-list-item">
                 <NewsCard article={article} onClick={handleSelectArticle} />
               </div>
@@ -99,4 +116,4 @@ const NewsList: React.FC<NewsListProps> = ({ filters, onSelectArticle }) => {
   );
 };
 
-export default NewsList;
+export default React.memo(NewsList);

@@ -4,36 +4,53 @@
  * 뉴스 기사 필터링을 위한 컴포넌트를 제공합니다.
  */
 
-import React, { useState, useEffect } from "react";
-import { useDebounce } from "../../../../core/hooks";
-import { Button, Card, Input, Dropdown } from "../../../../components/ui";
-import { useNews } from "../../hooks";
-import { FetchNewsParams } from "../../types";
-import "./NewsFilter.css";
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useDebounce } from '../../../../core/hooks';
+import { Button, Card, Input, Dropdown } from '../../../../components/ui';
+import { useNews } from '../../hooks';
+import { FetchNewsParams } from '../../types';
+import './NewsFilter.css';
 
 interface NewsFilterProps {
-  onFilter: (filters: FetchNewsParams["filters"]) => void;
-  initialFilters?: FetchNewsParams["filters"];
+  onFilter: (filters: FetchNewsParams['filters']) => void;
+  initialFilters?: FetchNewsParams['filters'];
 }
 
 /**
  * 뉴스 필터 컴포넌트
  */
-const NewsFilter: React.FC<NewsFilterProps> = ({
-  onFilter,
-  initialFilters = {},
-}) => {
+const NewsFilter: React.FC<NewsFilterProps> = ({ onFilter, initialFilters = {} }) => {
   const { getCategories, getSources, categories, sources } = useNews();
 
-  const [startDate, setStartDate] = useState(initialFilters.startDate || "");
-  const [endDate, setEndDate] = useState(initialFilters.endDate || "");
-  const [source, setSource] = useState(initialFilters.source || "");
-  const [category, setCategory] = useState(initialFilters.category || "");
-  const [sentiment, setSentiment] = useState(initialFilters.sentiment || "");
-  const [keyword, setKeyword] = useState(initialFilters.keyword || "");
+  const [startDate, setStartDate] = useState(initialFilters.startDate || '');
+  const [endDate, setEndDate] = useState(initialFilters.endDate || '');
+  const [source, setSource] = useState(initialFilters.source || '');
+  const [category, setCategory] = useState(initialFilters.category || '');
+  const [sentiment, setSentiment] = useState(initialFilters.sentiment || '');
+  const [keyword, setKeyword] = useState(initialFilters.keyword || '');
   const [isExpanded, setIsExpanded] = useState(false);
 
   const debouncedKeyword = useDebounce(keyword, 500);
+
+  // 카테고리 옵션 계산
+  const categoryOptions = useMemo(() => {
+    return categories.map((cat: string) => ({ value: cat, label: cat }));
+  }, [categories]);
+
+  // 출처 옵션 계산
+  const sourceOptions = useMemo(() => {
+    return sources.map((src: string) => ({ value: src, label: src }));
+  }, [sources]);
+
+  // 감성 옵션 계산
+  const sentimentOptions = useMemo(() => {
+    return [
+      { value: '', label: '전체' },
+      { value: 'positive', label: '긍정적' },
+      { value: 'neutral', label: '중립적' },
+      { value: 'negative', label: '부정적' },
+    ];
+  }, []);
 
   // 카테고리 및 소스 목록 가져오기
   useEffect(() => {
@@ -44,18 +61,18 @@ const NewsFilter: React.FC<NewsFilterProps> = ({
   // 초기 필터 설정
   useEffect(() => {
     if (initialFilters) {
-      setStartDate(initialFilters.startDate || "");
-      setEndDate(initialFilters.endDate || "");
-      setSource(initialFilters.source || "");
-      setCategory(initialFilters.category || "");
-      setSentiment(initialFilters.sentiment || "");
-      setKeyword(initialFilters.keyword || "");
+      setStartDate(initialFilters.startDate || '');
+      setEndDate(initialFilters.endDate || '');
+      setSource(initialFilters.source || '');
+      setCategory(initialFilters.category || '');
+      setSentiment(initialFilters.sentiment || '');
+      setKeyword(initialFilters.keyword || '');
     }
   }, [initialFilters]);
 
   // 필터 적용 핸들러
-  const handleApplyFilter = () => {
-    const filters: FetchNewsParams["filters"] = {};
+  const handleApplyFilter = useCallback(() => {
+    const filters: FetchNewsParams['filters'] = {};
 
     if (startDate) filters.startDate = startDate;
     if (endDate) filters.endDate = endDate;
@@ -65,30 +82,60 @@ const NewsFilter: React.FC<NewsFilterProps> = ({
     if (keyword) filters.keyword = keyword;
 
     onFilter(filters);
-  };
+  }, [startDate, endDate, source, category, sentiment, keyword, onFilter]);
 
   // 필터 초기화 핸들러
-  const handleResetFilter = () => {
-    setStartDate("");
-    setEndDate("");
-    setSource("");
-    setCategory("");
-    setSentiment("");
-    setKeyword("");
+  const handleResetFilter = useCallback(() => {
+    setStartDate('');
+    setEndDate('');
+    setSource('');
+    setCategory('');
+    setSentiment('');
+    setKeyword('');
     onFilter({});
-  };
+  }, [onFilter]);
 
   // 필터 토글 핸들러
-  const toggleFilter = () => {
-    setIsExpanded(!isExpanded);
-  };
+  const toggleFilter = useCallback(() => {
+    setIsExpanded(prev => !prev);
+  }, []);
+
+  // 키워드 변경 핸들러
+  const handleKeywordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setKeyword(e.target.value);
+  }, []);
+
+  // 시작일 변경 핸들러
+  const handleStartDateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setStartDate(e.target.value);
+  }, []);
+
+  // 종료일 변경 핸들러
+  const handleEndDateChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setEndDate(e.target.value);
+  }, []);
+
+  // 카테고리 변경 핸들러
+  const handleCategoryChange = useCallback((value: string) => {
+    setCategory(value);
+  }, []);
+
+  // 출처 변경 핸들러
+  const handleSourceChange = useCallback((value: string) => {
+    setSource(value);
+  }, []);
+
+  // 감성 변경 핸들러
+  const handleSentimentChange = useCallback((value: string) => {
+    setSentiment(value);
+  }, []);
 
   return (
     <Card className="news-filter">
       <div className="news-filter-header">
         <h3 className="news-filter-title">뉴스 필터</h3>
         <Button variant="text" onClick={toggleFilter}>
-          {isExpanded ? "접기" : "펼치기"}
+          {isExpanded ? '접기' : '펼치기'}
         </Button>
       </div>
 
@@ -101,7 +148,7 @@ const NewsFilter: React.FC<NewsFilterProps> = ({
                 id="keyword"
                 type="text"
                 value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
+                onChange={handleKeywordChange}
                 placeholder="키워드 입력"
                 fullWidth
               />
@@ -115,7 +162,7 @@ const NewsFilter: React.FC<NewsFilterProps> = ({
                 id="startDate"
                 type="date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                onChange={handleStartDateChange}
                 fullWidth
               />
             </div>
@@ -126,7 +173,7 @@ const NewsFilter: React.FC<NewsFilterProps> = ({
                 id="endDate"
                 type="date"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+                onChange={handleEndDateChange}
                 fullWidth
               />
             </div>
@@ -137,8 +184,8 @@ const NewsFilter: React.FC<NewsFilterProps> = ({
               <Dropdown
                 label="카테고리"
                 value={category}
-                onChange={setCategory}
-                options={categories.map((cat) => ({ value: cat, label: cat }))}
+                onChange={handleCategoryChange}
+                options={categoryOptions}
                 placeholder="카테고리 선택"
                 fullWidth
               />
@@ -148,8 +195,8 @@ const NewsFilter: React.FC<NewsFilterProps> = ({
               <Dropdown
                 label="출처"
                 value={source}
-                onChange={setSource}
-                options={sources.map((src) => ({ value: src, label: src }))}
+                onChange={handleSourceChange}
+                options={sourceOptions}
                 placeholder="출처 선택"
                 fullWidth
               />
@@ -161,13 +208,8 @@ const NewsFilter: React.FC<NewsFilterProps> = ({
               <Dropdown
                 label="감성"
                 value={sentiment}
-                onChange={setSentiment}
-                options={[
-                  { value: "", label: "전체" },
-                  { value: "positive", label: "긍정적" },
-                  { value: "neutral", label: "중립적" },
-                  { value: "negative", label: "부정적" },
-                ]}
+                onChange={handleSentimentChange}
+                options={sentimentOptions}
                 placeholder="감성 선택"
                 fullWidth
               />
@@ -186,4 +228,4 @@ const NewsFilter: React.FC<NewsFilterProps> = ({
   );
 };
 
-export default NewsFilter;
+export default React.memo(NewsFilter);

@@ -1,6 +1,6 @@
 /**
  * 애플리케이션 공통 타입 모듈
- * 
+ *
  * 애플리케이션 전체에서 사용되는 공통 타입을 정의합니다.
  */
 
@@ -51,10 +51,10 @@ export interface ApiResponse<T> {
 
 // 전체 스토어 상태 타입
 export interface RootState {
-  auth: import('../features/auth/types').AuthState;
-  news: import('../features/news/types').NewsState;
-  stocks: import('../features/stock/types').StockState;
-  sentimentAnalysis: import('../features/sentiment-analysis/types').SentimentAnalysisState;
-  dashboard: import('../features/dashboard/types').DashboardState;
-  ui: import('../features/ui/types').UiState;
+  auth: any; // 인증 관련 상태
+  news: any; // 뉴스 관련 상태
+  stocks: any; // 주식 관련 상태
+  sentimentAnalysis: any; // 감성 분석 관련 상태
+  dashboard: any; // 대시보드 관련 상태
+  ui: any; // UI 관련 상태
 }

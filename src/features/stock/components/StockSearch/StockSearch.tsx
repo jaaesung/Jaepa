@@ -1,6 +1,6 @@
 /**
  * 주식 검색 컴포넌트
- * 
+ *
  * 주식 검색 기능을 제공하는 컴포넌트입니다.
  */
 
@@ -53,7 +53,7 @@ const StockSearch: React.FC<StockSearchProps> = ({
     setQuery('');
     setIsOpen(false);
     clearStockSearchResults();
-    
+
     if (onSelect) {
       onSelect(symbol);
     } else {
@@ -64,7 +64,7 @@ const StockSearch: React.FC<StockSearchProps> = ({
   // 검색 폼 제출 핸들러
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (searchResults.length > 0) {
       handleSelect(searchResults[0].symbol);
     }
@@ -120,7 +120,7 @@ const StockSearch: React.FC<StockSearchProps> = ({
             </div>
           ) : (
             <ul className="stock-search-list">
-              {searchResults.map((result) => (
+              {searchResults.map((result: { symbol: string; name: string; exchange: string }) => (
                 <li key={result.symbol} className="stock-search-item">
                   <button
                     className="stock-search-item-button"

@@ -20,47 +20,35 @@ import Toast, {
 } from "./Toast";
 import LoadingSpinner from "./LoadingSpinner";
 
+// 컴포넌트 내보내기
 export {
-  // Button
   Button,
+  Input,
+  Card,
+  Checkbox,
+  Modal,
+  Dropdown,
+  Table,
+  Toast,
+  ToastContainer,
+  LoadingSpinner,
+};
+
+// 타입 내보내기
+export type {
   ButtonProps,
   ButtonVariant,
   ButtonSize,
-
-  // Input
-  Input,
   InputProps,
-
-  // Card
-  Card,
   CardProps,
-
-  // Checkbox
-  Checkbox,
   CheckboxProps,
-
-  // Modal
-  Modal,
   ModalProps,
-
-  // Dropdown
-  Dropdown,
   DropdownProps,
   DropdownOption,
-
-  // Table
-  Table,
   TableProps,
   TableColumn,
-
-  // Toast
-  Toast,
-  ToastContainer,
   ToastProps,
   ToastType,
   ToastContainerProps,
   ToastPosition,
-
-  // LoadingSpinner
-  LoadingSpinner,
 };

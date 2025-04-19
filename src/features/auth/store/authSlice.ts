@@ -1,15 +1,24 @@
 /**
  * 인증 상태 관리 모듈
- * 
+ *
  * 인증 관련 상태 관리를 위한 Redux 슬라이스를 제공합니다.
  */
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import authService from '../services/authService';
-import { AuthState, User, LoginCredentials, RegisterCredentials, AuthResponse } from '../types';
+import {
+  AuthState,
+  User,
+  LoginRequest,
+  RegisterRequest,
+  UpdateProfileRequest,
+  AuthResponse,
+} from '../types';
+import { localStorageService } from '../../../services/storage';
+import { storageConstants } from '../../../core/constants';
 
 // 로그인 액션
-export const login = createAsyncThunk<AuthResponse, LoginCredentials, { rejectValue: string }>(
+export const login = createAsyncThunk<AuthResponse, LoginRequest, { rejectValue: string }>(
   'auth/login',
   async ({ email, password }, { rejectWithValue }) => {
     try {
@@ -18,7 +27,7 @@ export const login = createAsyncThunk<AuthResponse, LoginCredentials, { rejectVa
       console.log('로그인 성공:', response);
       const authResponse: AuthResponse = {
         user: response.user,
-        token: response.token,
+        accessToken: response.accessToken,
         isAuthenticated: true,
       };
       return authResponse;
@@ -31,31 +40,30 @@ export const login = createAsyncThunk<AuthResponse, LoginCredentials, { rejectVa
 );
 
 // 회원가입 액션
-export const register = createAsyncThunk<
-  AuthResponse,
-  RegisterCredentials,
-  { rejectValue: string }
->('auth/register', async ({ username, email, password }, { rejectWithValue }) => {
-  try {
-    console.log('회원가입 시도:', { email, username });
-    const response = await authService.register({
-      username,
-      email,
-      password,
-    });
-    console.log('회원가입 성공:', response);
-    const authResponse: AuthResponse = {
-      user: response.user,
-      token: response.token,
-      isAuthenticated: true,
-    };
-    return authResponse;
-  } catch (error) {
-    console.error('회원가입 실패:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Registration failed';
-    return rejectWithValue(errorMessage);
+export const register = createAsyncThunk<AuthResponse, RegisterRequest, { rejectValue: string }>(
+  'auth/register',
+  async ({ username, email, password }, { rejectWithValue }) => {
+    try {
+      console.log('회원가입 시도:', { email, username });
+      const response = await authService.register({
+        username,
+        email,
+        password,
+      });
+      console.log('회원가입 성공:', response);
+      const authResponse: AuthResponse = {
+        user: response.user,
+        accessToken: response.accessToken,
+        isAuthenticated: true,
+      };
+      return authResponse;
+    } catch (error) {
+      console.error('회원가입 실패:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Registration failed';
+      return rejectWithValue(errorMessage);
+    }
   }
-});
+);
 
 // 로그아웃 액션
 export const logout = createAsyncThunk('auth/logout', async () => {
@@ -63,12 +71,13 @@ export const logout = createAsyncThunk('auth/logout', async () => {
 });
 
 // 인증 상태 확인 액션
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const checkAuthStatus = createAsyncThunk<any, void, { rejectValue: string }>(
-  'auth/check',
-  async _ => {
+export const verifyAuth = createAsyncThunk<AuthResponse, void, { rejectValue: string }>(
+  'auth/verify',
+  async (_, { rejectWithValue }): Promise<AuthResponse | any> => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorageService.getItem<string>(
+        storageConstants.LOCAL_STORAGE_KEYS.ACCESS_TOKEN
+      );
       if (!token) {
         // 토큰이 없으면 인증되지 않은 상태로 처리
         return { isAuthenticated: false, user: null };
@@ -80,27 +89,25 @@ export const checkAuthStatus = createAsyncThunk<any, void, { rejectValue: string
         return {
           isAuthenticated: true,
           user,
-          token,
+          accessToken: token,
         };
       } catch (userError) {
         // 사용자 정보 가져오기 실패 시 토큰 삭제
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
-        // 인증되지 않은 상태로 처리 (오류로 처리하지 않음)
+        localStorageService.removeItem(storageConstants.LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
         return { isAuthenticated: false, user: null };
       }
     } catch (error) {
       // 기타 오류 처리
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
-      // 인증되지 않은 상태로 처리 (오류로 처리하지 않음)
-      return { isAuthenticated: false, user: null };
+      localStorageService.removeItem(storageConstants.LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Authentication verification failed';
+      throw rejectWithValue(errorMessage);
     }
   }
 );
 
 // 프로필 업데이트 액션
-export const updateProfile = createAsyncThunk<User, Partial<User>, { rejectValue: string }>(
+export const updateProfile = createAsyncThunk<User, UpdateProfileRequest, { rejectValue: string }>(
   'auth/updateProfile',
   async (userData, { rejectWithValue }) => {
     try {
@@ -126,10 +133,38 @@ export const changePassword = createAsyncThunk<
   }
 });
 
+// 비밀번호 찾기 액션
+export const forgotPassword = createAsyncThunk<
+  { success: boolean; message: string },
+  { email: string },
+  { rejectValue: string }
+>('auth/forgotPassword', async ({ email }, { rejectWithValue }) => {
+  try {
+    return await authService.forgotPassword(email);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Forgot password request failed';
+    return rejectWithValue(errorMessage);
+  }
+});
+
+// 비밀번호 재설정 액션
+export const resetPassword = createAsyncThunk<
+  { success: boolean; message: string },
+  { token: string; password: string },
+  { rejectValue: string }
+>('auth/resetPassword', async ({ token, password }, { rejectWithValue }) => {
+  try {
+    return await authService.resetPassword(token, password);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Password reset failed';
+    return rejectWithValue(errorMessage);
+  }
+});
+
 // 초기 상태
 const initialState: AuthState = {
   user: null,
-  token: null,
+  accessToken: null,
   isAuthenticated: false,
   isLoading: false,
   error: null,
@@ -155,7 +190,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isAuthenticated = true;
         state.user = action.payload.user;
-        state.token = action.payload.token || null;
+        state.accessToken = action.payload.accessToken || null;
       })
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false;
@@ -171,7 +206,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isAuthenticated = true;
         state.user = action.payload.user;
-        state.token = action.payload.token || null;
+        state.accessToken = action.payload.accessToken || null;
       })
       .addCase(register.rejected, (state, action) => {
         state.isLoading = false;
@@ -181,26 +216,25 @@ const authSlice = createSlice({
       // Logout reducers
       .addCase(logout.fulfilled, state => {
         state.user = null;
-        state.token = null;
+        state.accessToken = null;
         state.isAuthenticated = false;
       })
 
-      // Check auth status reducers
-      .addCase(checkAuthStatus.pending, state => {
+      // Verify auth reducers
+      .addCase(verifyAuth.pending, state => {
         state.isLoading = true;
       })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .addCase(checkAuthStatus.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(verifyAuth.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = action.payload.isAuthenticated;
         state.user = action.payload.user;
-        state.token = action.payload.token || null;
+        state.accessToken = action.payload.accessToken || null;
       })
-      .addCase(checkAuthStatus.rejected, state => {
+      .addCase(verifyAuth.rejected, state => {
         state.isLoading = false;
         state.isAuthenticated = false;
         state.user = null;
-        state.token = null;
+        state.accessToken = null;
       })
 
       // Update profile reducers
@@ -228,9 +262,36 @@ const authSlice = createSlice({
       .addCase(changePassword.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || 'Password change failed';
+      })
+
+      // Forgot password reducers
+      .addCase(forgotPassword.pending, state => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(forgotPassword.fulfilled, state => {
+        state.isLoading = false;
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload || 'Forgot password request failed';
+      })
+
+      // Reset password reducers
+      .addCase(resetPassword.pending, state => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(resetPassword.fulfilled, state => {
+        state.isLoading = false;
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload || 'Password reset failed';
       });
   },
 });
 
 export const { clearError } = authSlice.actions;
 export default authSlice.reducer;
+export { type AuthState };

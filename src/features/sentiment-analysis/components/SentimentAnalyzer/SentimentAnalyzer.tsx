@@ -1,18 +1,19 @@
 /**
  * 감성 분석기 컴포넌트
- * 
+ *
  * 텍스트 입력을 받아 감성 분석을 수행하는 컴포넌트를 제공합니다.
  */
 
 import React, { useState, useEffect } from 'react';
-import { Button, Card, Input } from '../../../../components/ui';
+import { Button, Card } from '../../../../components/ui';
 import { useSentiment } from '../../hooks/useSentiment';
+import { SentimentModel } from '../../types';
 import SentimentResult from '../SentimentResult';
 import './SentimentAnalyzer.css';
 
 interface SentimentAnalyzerProps {
   initialText?: string;
-  onAnalysisComplete?: (result: any) => void;
+  onAnalysisComplete?: (result: Record<string, any>) => void;
 }
 
 /**
@@ -24,7 +25,8 @@ const SentimentAnalyzer: React.FC<SentimentAnalyzerProps> = ({
 }) => {
   const [text, setText] = useState(initialText);
   const [selectedModel, setSelectedModel] = useState<string>('');
-  const { analyzeText, results, isLoading, error, models, getModels, modelsLoading } = useSentiment();
+  const { analyzeText, results, isLoading, error, models, getModels, modelsLoading } =
+    useSentiment();
 
   // 모델 목록 가져오기
   useEffect(() => {
@@ -32,7 +34,7 @@ const SentimentAnalyzer: React.FC<SentimentAnalyzerProps> = ({
       getModels();
     } else if (selectedModel === '' && models.length > 0) {
       // 기본 모델 선택
-      const defaultModel = models.find(model => model.isDefault);
+      const defaultModel = models.find((model: SentimentModel) => model.isDefault);
       setSelectedModel(defaultModel?.id || models[0].id);
     }
   }, [getModels, models, selectedModel]);
@@ -53,7 +55,8 @@ const SentimentAnalyzer: React.FC<SentimentAnalyzerProps> = ({
 
     const success = await analyzeText({
       text,
-      model: selectedModel,
+      modelId: selectedModel,
+      model: selectedModel, // 레거시 코드와의 호환성을 위해 추가
     });
 
     if (success && onAnalysisComplete) {
@@ -68,9 +71,7 @@ const SentimentAnalyzer: React.FC<SentimentAnalyzerProps> = ({
     <Card className="sentiment-analyzer">
       <div className="sentiment-analyzer-header">
         <h2 className="sentiment-analyzer-title">감성 분석</h2>
-        <p className="sentiment-analyzer-description">
-          텍스트를 입력하여 감성 분석을 수행하세요.
-        </p>
+        <p className="sentiment-analyzer-description">텍스트를 입력하여 감성 분석을 수행하세요.</p>
       </div>
 
       <div className="sentiment-analyzer-content">
@@ -95,7 +96,7 @@ const SentimentAnalyzer: React.FC<SentimentAnalyzerProps> = ({
                 {modelsLoading ? (
                   <option value="">모델 로딩 중...</option>
                 ) : (
-                  models.map(model => (
+                  models.map((model: SentimentModel) => (
                     <option key={model.id} value={model.id}>
                       {model.name}
                     </option>

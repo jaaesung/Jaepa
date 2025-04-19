@@ -1,6 +1,6 @@
 /**
  * 인증 기능 모듈
- * 
+ *
  * 사용자 인증 관련 기능을 제공합니다.
  */
 
@@ -9,7 +9,7 @@ import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 
 // 훅 내보내기
-import useAuth from './hooks/useAuth';
+import { useAuth } from './hooks/useAuth';
 
 // 서비스 내보내기
 import authService from './services/authService';
@@ -24,17 +24,17 @@ export {
   // 컴포넌트
   LoginForm,
   RegisterForm,
-  
+
   // 훅
   useAuth,
-  
+
   // 서비스
   authService,
-  
+
   // 상태 관리
   authReducer,
   authActions,
-  
+
   // 타입
   authTypes,
 };

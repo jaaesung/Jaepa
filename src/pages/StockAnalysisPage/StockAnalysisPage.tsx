@@ -1,6 +1,6 @@
 /**
  * 주식 분석 페이지 컴포넌트
- * 
+ *
  * 주식 분석 기능을 제공하는 페이지를 제공합니다.
  */
 
@@ -63,7 +63,7 @@ const StockAnalysisPage: React.FC = () => {
           <div className="stock-analysis-sidebar">
             <Card className="popular-stocks-card">
               <h3 className="popular-stocks-title">인기 주식</h3>
-              
+
               {popularLoading ? (
                 <div className="popular-stocks-loading">
                   <div className="spinner"></div>
@@ -75,30 +75,39 @@ const StockAnalysisPage: React.FC = () => {
                 </div>
               ) : (
                 <ul className="popular-stocks-list">
-                  {popularStocks.slice(0, 10).map((stock) => (
-                    <li
-                      key={stock.symbol}
-                      className={`popular-stock-item ${
-                        stock.symbol === selectedSymbol ? 'active' : ''
-                      }`}
-                    >
-                      <button
-                        className="popular-stock-button"
-                        onClick={() => handleSelectPopularStock(stock.symbol)}
-                      >
-                        <div className="popular-stock-symbol">{stock.symbol}</div>
-                        <div className="popular-stock-name">{stock.name}</div>
-                        <div
-                          className={`popular-stock-change ${
-                            stock.changePercent >= 0 ? 'positive' : 'negative'
+                  {popularStocks
+                    .slice(0, 10)
+                    .map(
+                      (stock: {
+                        symbol: string;
+                        name: string;
+                        change: number;
+                        changePercent: number;
+                      }) => (
+                        <li
+                          key={stock.symbol}
+                          className={`popular-stock-item ${
+                            stock.symbol === selectedSymbol ? 'active' : ''
                           }`}
                         >
-                          {stock.changePercent >= 0 ? '+' : ''}
-                          {stock.changePercent.toFixed(2)}%
-                        </div>
-                      </button>
-                    </li>
-                  ))}
+                          <button
+                            className="popular-stock-button"
+                            onClick={() => handleSelectPopularStock(stock.symbol)}
+                          >
+                            <div className="popular-stock-symbol">{stock.symbol}</div>
+                            <div className="popular-stock-name">{stock.name}</div>
+                            <div
+                              className={`popular-stock-change ${
+                                stock.changePercent >= 0 ? 'positive' : 'negative'
+                              }`}
+                            >
+                              {stock.changePercent >= 0 ? '+' : ''}
+                              {stock.changePercent.toFixed(2)}%
+                            </div>
+                          </button>
+                        </li>
+                      )
+                    )}
                 </ul>
               )}
             </Card>
@@ -106,8 +115,9 @@ const StockAnalysisPage: React.FC = () => {
             <Card className="stock-analysis-info-card">
               <h3 className="stock-analysis-info-title">주식 분석이란?</h3>
               <p className="stock-analysis-info-text">
-                주식 분석은 주식의 가격 변동, 거래량, 기술적 지표 등을 분석하여 투자 결정을 내리는 데 도움을 주는 과정입니다.
-                기술적 분석과 기본적 분석을 통해 주식의 미래 가격 움직임을 예측할 수 있습니다.
+                주식 분석은 주식의 가격 변동, 거래량, 기술적 지표 등을 분석하여 투자 결정을 내리는
+                데 도움을 주는 과정입니다. 기술적 분석과 기본적 분석을 통해 주식의 미래 가격
+                움직임을 예측할 수 있습니다.
               </p>
               <h4 className="stock-analysis-info-subtitle">주요 특징</h4>
               <ul className="stock-analysis-info-list">

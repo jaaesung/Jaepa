@@ -1,14 +1,13 @@
 /**
  * API 관련 상수 모듈
- * 
+ *
  * API 관련 상수를 정의합니다.
  */
 
 // API 기본 URL
 export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
 
-// API 타임아웃 (밀리초)
-export const API_TIMEOUT = 30000;
+// API 타임아웃은 config에서 가져옵니다.
 
 // API 엔드포인트
 export const API_ENDPOINTS = {
@@ -24,7 +23,7 @@ export const API_ENDPOINTS = {
     RESET_PASSWORD: 'reset-password',
     UPDATE_PROFILE: 'update-profile',
   },
-  
+
   // 뉴스 관련 엔드포인트
   NEWS: {
     LIST: 'list',
@@ -33,7 +32,7 @@ export const API_ENDPOINTS = {
     CATEGORIES: 'categories',
     SOURCES: 'sources',
   },
-  
+
   // 감성 분석 관련 엔드포인트
   SENTIMENT: {
     ANALYZE: 'analyze',
@@ -41,7 +40,7 @@ export const API_ENDPOINTS = {
     STATS: 'stats',
     MODELS: 'models',
   },
-  
+
   // 주식 관련 엔드포인트
   STOCK: {
     LIST: 'list',
@@ -59,6 +58,8 @@ export const API_SERVICES = {
   NEWS: 'news',
   SENTIMENT: 'sentiment',
   STOCK: 'stock',
+  STOCKS: 'stocks', // 주식 서비스 (레거시 코드와의 호환성을 위해 추가)
+  ANALYSIS: 'analysis', // 분석 서비스 (레거시 코드와의 호환성을 위해 추가)
   USER: 'user',
 };
 

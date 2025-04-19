@@ -4,18 +4,19 @@
  * 사용자 대시보드를 제공합니다.
  */
 
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { MainLayout } from "../../components/layout";
-import { Card, Button } from "../../components/ui";
-import { useAuth } from "../../features/auth";
-import { useNews } from "../../features/news";
-import { useSentiment } from "../../features/sentiment-analysis";
-import { useStock } from "../../features/stock";
-import { SentimentTrendChart } from "../../features/sentiment-analysis";
-import { StockChart } from "../../features/stock";
-import { NewsCard } from "../../features/news";
-import "./DashboardPage.css";
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { MainLayout } from '../../components/layout';
+import { Card, Button } from '../../components/ui';
+import { useAuth } from '../../features/auth';
+import { useNews } from '../../features/news';
+import { NewsArticle } from '../../features/news/types';
+import { useSentiment } from '../../features/sentiment-analysis';
+import { useStock } from '../../features/stock';
+import { SentimentTrendChart } from '../../features/sentiment-analysis';
+import { StockChart } from '../../features/stock';
+import { NewsCard } from '../../features/news';
+import './DashboardPage.css';
 
 /**
  * 대시보드 페이지 컴포넌트
@@ -24,30 +25,30 @@ const DashboardPage: React.FC = () => {
   const { user } = useAuth();
   const { getNews, articles } = useNews();
   const { getTrend } = useSentiment();
-  const { getPopularStocks, popularStocks } = useStock();
+  const { getPopularStocks } = useStock();
   const [isLoading, setIsLoading] = useState(true);
-  const [stockSymbol, setStockSymbol] = useState("AAPL");
+  const [stockSymbol] = useState('AAPL');
 
   // 대시보드 데이터 로드
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
         // 뉴스 데이터 로드
-        await getNews({ page: 1, limit: 4 });
+        await getNews({ page: 1, pageSize: 4 });
 
         // 감성 트렌드 데이터 로드
-        const endDate = new Date().toISOString().split("T")[0];
+        const endDate = new Date().toISOString().split('T')[0];
         const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
           .toISOString()
-          .split("T")[0];
-        await getTrend({ startDate, endDate, interval: "day" });
+          .split('T')[0];
+        await getTrend({ startDate, endDate, interval: 'day' });
 
         // 인기 주식 데이터 로드
         await getPopularStocks();
 
         setIsLoading(false);
       } catch (error) {
-        console.error("대시보드 데이터 로드 오류:", error);
+        console.error('대시보드 데이터 로드 오류:', error);
         setIsLoading(false);
       }
     };
@@ -61,8 +62,7 @@ const DashboardPage: React.FC = () => {
         <div className="dashboard-header">
           <h1 className="dashboard-title">대시보드</h1>
           <p className="dashboard-welcome">
-            안녕하세요, {user?.name || "사용자"}님! 오늘의 금융 인사이트를
-            확인하세요.
+            안녕하세요, {user?.name || '사용자'}님! 오늘의 금융 인사이트를 확인하세요.
           </p>
         </div>
 
@@ -126,10 +126,7 @@ const DashboardPage: React.FC = () => {
                 <Card className="chart-card">
                   <div className="chart-header">
                     <h3 className="chart-title">주식 차트</h3>
-                    <Link
-                      to={`/stock-analysis/${stockSymbol}`}
-                      className="chart-link"
-                    >
+                    <Link to={`/stock-analysis/${stockSymbol}`} className="chart-link">
                       더 보기
                     </Link>
                   </div>
@@ -148,7 +145,7 @@ const DashboardPage: React.FC = () => {
 
                   <div className="recent-list">
                     {articles && articles.length > 0 ? (
-                      articles.map((article) => (
+                      articles.map((article: NewsArticle) => (
                         <div key={article.id} className="dashboard-news-item">
                           <NewsCard article={article} />
                         </div>
@@ -163,7 +160,7 @@ const DashboardPage: React.FC = () => {
                   <div className="dashboard-actions">
                     <Button
                       variant="outline"
-                      onClick={() => window.open("/news-analysis", "_self")}
+                      onClick={() => window.open('/news-analysis', '_self')}
                     >
                       모든 뉴스 보기
                     </Button>

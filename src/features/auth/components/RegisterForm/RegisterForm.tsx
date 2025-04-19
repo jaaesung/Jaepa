@@ -4,23 +4,23 @@
  * 사용자 회원가입을 위한 폼 컴포넌트를 제공합니다.
  */
 
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
-import { Button, Input, Checkbox } from "../../../../components/ui";
-import { validationUtils } from "../../../../core/utils";
-import "./RegisterForm.css";
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { Button, Input, Checkbox } from '../../../../components/ui';
+import { validationUtils } from '../../../../core/utils';
+import './RegisterForm.css';
 
 interface RegisterFormProps {
   onSuccess?: () => void;
 }
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
-  const [username, setUsername] = useState("");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [errors, setErrors] = useState<{
     username?: string;
@@ -38,12 +38,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
     const isValid = username.length >= 3;
 
     if (!isValid) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
-        username: "사용자명은 최소 3자 이상이어야 합니다.",
+        username: '사용자명은 최소 3자 이상이어야 합니다.',
       }));
     } else {
-      setErrors((prev) => ({ ...prev, username: undefined }));
+      setErrors(prev => ({ ...prev, username: undefined }));
     }
 
     return isValid;
@@ -54,12 +54,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
     const isValid = name.length >= 2;
 
     if (!isValid) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
-        name: "이름은 최소 2자 이상이어야 합니다.",
+        name: '이름은 최소 2자 이상이어야 합니다.',
       }));
     } else {
-      setErrors((prev) => ({ ...prev, name: undefined }));
+      setErrors(prev => ({ ...prev, name: undefined }));
     }
 
     return isValid;
@@ -70,12 +70,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
     const isValid = validationUtils.isValidEmail(email);
 
     if (!isValid) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
-        email: "유효한 이메일 주소를 입력해주세요.",
+        email: '유효한 이메일 주소를 입력해주세요.',
       }));
     } else {
-      setErrors((prev) => ({ ...prev, email: undefined }));
+      setErrors(prev => ({ ...prev, email: undefined }));
     }
 
     return isValid;
@@ -86,13 +86,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
     const isValid = validationUtils.isValidPassword(password);
 
     if (!isValid) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
-        password:
-          "비밀번호는 최소 8자 이상이며, 문자, 숫자, 특수문자를 포함해야 합니다.",
+        password: '비밀번호는 최소 8자 이상이며, 문자, 숫자, 특수문자를 포함해야 합니다.',
       }));
     } else {
-      setErrors((prev) => ({ ...prev, password: undefined }));
+      setErrors(prev => ({ ...prev, password: undefined }));
     }
 
     return isValid;
@@ -103,12 +102,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
     const isValid = confirmPassword === password;
 
     if (!isValid) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
-        confirmPassword: "비밀번호가 일치하지 않습니다.",
+        confirmPassword: '비밀번호가 일치하지 않습니다.',
       }));
     } else {
-      setErrors((prev) => ({ ...prev, confirmPassword: undefined }));
+      setErrors(prev => ({ ...prev, confirmPassword: undefined }));
     }
 
     return isValid;
@@ -119,12 +118,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
     const isValid = agreeTerms;
 
     if (!isValid) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
-        agreeTerms: "서비스 이용약관에 동의해주세요.",
+        agreeTerms: '서비스 이용약관에 동의해주세요.',
       }));
     } else {
-      setErrors((prev) => ({ ...prev, agreeTerms: undefined }));
+      setErrors(prev => ({ ...prev, agreeTerms: undefined }));
     }
 
     return isValid;
@@ -156,7 +155,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
     // 회원가입 시도
     const success = await register({
       username,
-      name,
+      fullName: name,
       email,
       password,
     });
@@ -178,7 +177,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
             type="text"
             label="사용자명"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={e => setUsername(e.target.value)}
             onBlur={() => validateUsername(username)}
             error={errors.username}
             fullWidth
@@ -191,7 +190,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
             type="text"
             label="이름"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={e => setName(e.target.value)}
             onBlur={() => validateName(name)}
             error={errors.name}
             fullWidth
@@ -204,7 +203,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
             type="email"
             label="이메일"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={e => setEmail(e.target.value)}
             onBlur={() => validateEmail(email)}
             error={errors.email}
             fullWidth
@@ -217,7 +216,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
             type="password"
             label="비밀번호"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
             onBlur={() => validatePassword(password)}
             error={errors.password}
             fullWidth
@@ -230,7 +229,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
             type="password"
             label="비밀번호 확인"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={e => setConfirmPassword(e.target.value)}
             onBlur={() => validateConfirmPassword(confirmPassword)}
             error={errors.confirmPassword}
             fullWidth
@@ -243,18 +242,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
             id="agree-terms"
             label="서비스 이용약관에 동의합니다."
             checked={agreeTerms}
-            onChange={(e) => setAgreeTerms(e.target.checked)}
+            onChange={e => setAgreeTerms(e.target.checked)}
             error={errors.agreeTerms}
           />
         </div>
 
         <div className="form-actions">
-          <Button
-            type="submit"
-            variant="primary"
-            isLoading={isLoading}
-            fullWidth
-          >
+          <Button type="submit" variant="primary" isLoading={isLoading} fullWidth>
             회원가입
           </Button>
         </div>
