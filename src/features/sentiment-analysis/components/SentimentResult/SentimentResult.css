@@ -1,0 +1,127 @@
+/* 감성 분석 결과 */
+.sentiment-result {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* 감성 분석 결과 헤더 */
+.sentiment-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sentiment-result-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.sentiment-result-label {
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.sentiment-label-positive {
+  background-color: rgba(52, 168, 83, 0.1);
+  color: var(--success-color);
+}
+
+.sentiment-label-neutral {
+  background-color: rgba(251, 188, 4, 0.1);
+  color: var(--warning-color);
+}
+
+.sentiment-label-negative {
+  background-color: rgba(234, 67, 53, 0.1);
+  color: var(--danger-color);
+}
+
+/* 감성 점수 */
+.sentiment-result-scores {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sentiment-score-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sentiment-score-label {
+  width: 60px;
+  font-size: 0.875rem;
+  color: var(--text-color);
+}
+
+.sentiment-score-bar-container {
+  flex: 1;
+  height: 8px;
+  background-color: var(--bg-light);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.sentiment-score-bar {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.sentiment-score-positive {
+  background-color: var(--success-color);
+}
+
+.sentiment-score-neutral {
+  background-color: var(--warning-color);
+}
+
+.sentiment-score-negative {
+  background-color: var(--danger-color);
+}
+
+.sentiment-score-value {
+  width: 40px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-color);
+  text-align: right;
+}
+
+/* 감성 분석 결과 메타 정보 */
+.sentiment-result-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.75rem;
+}
+
+.sentiment-result-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.sentiment-result-meta-label {
+  color: var(--text-secondary);
+}
+
+.sentiment-result-meta-value {
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+/* 반응형 */
+@media (max-width: 576px) {
+  .sentiment-result-meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

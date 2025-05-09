@@ -1,0 +1,224 @@
+/* 대시보드 페이지 */
+.dashboard-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 대시보드 헤더 */
+.dashboard-header {
+  margin-bottom: 2rem;
+}
+
+.dashboard-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.dashboard-welcome {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+/* 대시보드 콘텐츠 */
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* 대시보드 로딩 */
+.dashboard-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 대시보드 요약 */
+.dashboard-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.summary-card {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+}
+
+.summary-icon {
+  font-size: 2.5rem;
+  margin-right: 1rem;
+}
+
+.summary-content {
+  flex: 1;
+}
+
+.summary-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.summary-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: 0.25rem;
+}
+
+.summary-change {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.summary-change.positive {
+  color: var(--success-color);
+}
+
+.summary-change.negative {
+  color: var(--danger-color);
+}
+
+/* 대시보드 차트 */
+.dashboard-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.chart-card {
+  padding: 1.5rem;
+}
+
+/* 차트 헤더 */
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.chart-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.chart-link {
+  font-size: 0.875rem;
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.chart-link:hover {
+  text-decoration: underline;
+}
+
+.chart-placeholder {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-light);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* 최근 뉴스 */
+.recent-card {
+  padding: 1.5rem;
+}
+
+.recent-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+/* 대시보드 뉴스 항목 */
+.dashboard-news-item {
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-news-item:last-child {
+  margin-bottom: 0;
+}
+
+/* 대시보드 뉴스 빈 상태 */
+.dashboard-news-empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  background-color: var(--bg-light);
+  border-radius: 8px;
+}
+
+/* 대시보드 액션 */
+.dashboard-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .dashboard-charts {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-placeholder {
+    height: 250px;
+  }
+}
+
+@media (max-width: 576px) {
+  .dashboard-title {
+    font-size: 1.5rem;
+  }
+
+  .summary-card {
+    padding: 1rem;
+  }
+
+  .summary-icon {
+    font-size: 2rem;
+  }
+
+  .summary-value {
+    font-size: 1.5rem;
+  }
+}

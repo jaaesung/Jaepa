@@ -1,0 +1,77 @@
+/* 로그인 폼 컨테이너 */
+.login-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+  padding: 2rem;
+}
+
+/* 로그인 폼 */
+.login-form {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 로그인 제목 */
+.login-title {
+  margin: 0 0 1.5rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+}
+
+/* 폼 그룹 */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+/* 폼 액션 */
+.form-actions {
+  margin-top: 2rem;
+}
+
+/* 로그인 상태 유지 */
+.form-remember {
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+/* 폼 링크 */
+.form-links {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+  gap: 0.75rem;
+}
+
+/* 회원가입 및 비밀번호 찾기 링크 */
+.register-link,
+.forgot-password-link {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.register-link:hover,
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
+
+/* 로그인 오류 메시지 */
+.login-error {
+  padding: 0.75rem;
+  margin-bottom: 1.5rem;
+  background-color: #fdeded;
+  border: 1px solid #f5c2c7;
+  border-radius: 4px;
+  color: #842029;
+  font-size: 0.875rem;
+}

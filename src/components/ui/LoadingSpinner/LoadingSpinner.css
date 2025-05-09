@@ -1,0 +1,86 @@
+/* 로딩 스피너 컨테이너 */
+.loading-spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 로딩 스피너 */
+.loading-spinner {
+  display: inline-block;
+  position: relative;
+}
+
+/* 로딩 스피너 원 */
+.loading-spinner-circle {
+  border-radius: 50%;
+  border-style: solid;
+  border-color: var(--border-color);
+  border-top-color: var(--primary-color);
+  animation: spin 1s linear infinite;
+}
+
+/* 로딩 스피너 크기 */
+.loading-spinner--small {
+  width: 16px;
+  height: 16px;
+}
+
+.loading-spinner--small .loading-spinner-circle {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+.loading-spinner--medium {
+  width: 24px;
+  height: 24px;
+}
+
+.loading-spinner--medium .loading-spinner-circle {
+  width: 24px;
+  height: 24px;
+  border-width: 3px;
+}
+
+.loading-spinner--large {
+  width: 40px;
+  height: 40px;
+}
+
+.loading-spinner--large .loading-spinner-circle {
+  width: 40px;
+  height: 40px;
+  border-width: 4px;
+}
+
+/* 로딩 스피너 색상 */
+.loading-spinner--primary .loading-spinner-circle {
+  border-color: rgba(26, 115, 232, 0.2);
+  border-top-color: var(--primary-color);
+}
+
+.loading-spinner--secondary .loading-spinner-circle {
+  border-color: rgba(95, 99, 104, 0.2);
+  border-top-color: var(--text-secondary);
+}
+
+.loading-spinner--white .loading-spinner-circle {
+  border-color: rgba(255, 255, 255, 0.2);
+  border-top-color: #ffffff;
+}
+
+/* 로딩 스피너 텍스트 */
+.loading-spinner-text {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* 로딩 스피너 애니메이션 */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

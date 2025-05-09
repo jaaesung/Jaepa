@@ -1,0 +1,192 @@
+/* 주식 정보 */
+.stock-info {
+  width: 100%;
+}
+
+/* 로딩 상태 */
+.stock-info-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 오류 상태 */
+.stock-info-error {
+  padding: 2rem;
+  color: var(--danger-color);
+  text-align: center;
+}
+
+/* 빈 상태 */
+.stock-info-empty {
+  padding: 2rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* 주식 정보 헤더 */
+.stock-info-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.stock-info-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.stock-info-title h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+  color: var(--text-color);
+}
+
+.stock-info-symbol {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-color);
+  margin-bottom: 0.25rem;
+}
+
+.stock-info-exchange {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* 관심 목록 버튼 */
+.watchlist-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--primary-color);
+  border-radius: 4px;
+  background-color: transparent;
+  color: var(--primary-color);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.watchlist-button:hover {
+  background-color: rgba(26, 115, 232, 0.05);
+}
+
+.watchlist-button.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+/* 주식 가격 정보 */
+.stock-info-price {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stock-info-current-price {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.stock-info-change {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.stock-info-change.positive {
+  color: var(--success-color);
+}
+
+.stock-info-change.negative {
+  color: var(--danger-color);
+}
+
+/* 주식 상세 정보 */
+.stock-info-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stock-info-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.stock-info-item {
+  flex: 1;
+  min-width: 150px;
+}
+
+.stock-info-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.stock-info-value {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+/* 회사 소개 */
+.stock-info-description {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.stock-info-description h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+  color: var(--text-color);
+}
+
+.stock-info-description p {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-color);
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .stock-info-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .watchlist-button {
+    align-self: flex-start;
+  }
+  
+  .stock-info-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}

@@ -1,0 +1,79 @@
+/* 뉴스 필터 */
+.news-filter {
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+/* 뉴스 필터 헤더 */
+.news-filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.news-filter-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+}
+
+/* 뉴스 필터 콘텐츠 */
+.news-filter-content {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* 뉴스 필터 행 */
+.news-filter-row {
+  display: flex;
+  gap: 1.5rem;
+}
+
+/* 뉴스 필터 필드 */
+.news-filter-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.news-filter-field label {
+  font-size: 0.875rem;
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.news-filter-field input,
+.news-filter-field select {
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  transition: border-color 0.2s ease;
+}
+
+.news-filter-field input:focus,
+.news-filter-field select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+/* 뉴스 필터 액션 */
+.news-filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .news-filter-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}

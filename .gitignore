@@ -91,8 +91,30 @@ test-results/
 .husky/
 .prettierrc
 jest.config.js
+jest.direct.config.js
 playwright.config.ts
 setupTests.ts
+node_modules/
+package-lock.json
+yarn.lock
+.eslintcache
+.eslintrc.js
+.eslintrc.json
+.babelrc
+.babelrc.js
+.browserslistrc
+tsconfig.json
+tsconfig.*.json
+craco.config.js
+
+# Docker 파일
+Dockerfile
+docker-compose.yml
+
+# 테스트 파일
+pytest.ini
+requirements-dev.txt
+requirements.txt
 
 # 이미지 및 미디어 파일
 *.png
@@ -103,3 +125,4 @@ setupTests.ts
 *.mp4
 *.webm
 *.mov
+node_modules

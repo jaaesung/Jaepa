@@ -1,0 +1,83 @@
+/* 404 페이지 */
+.not-found-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 404 콘텐츠 */
+.not-found-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+}
+
+/* 404 컨테이너 */
+.not-found-container {
+  max-width: 600px;
+  text-align: center;
+}
+
+/* 404 이미지 */
+.not-found-image {
+  margin-bottom: 2rem;
+}
+
+.not-found-code {
+  font-size: 8rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  line-height: 1;
+  display: block;
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}
+
+/* 404 제목 */
+.not-found-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+/* 404 설명 */
+.not-found-description {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+/* 404 액션 */
+.not-found-actions {
+  display: flex;
+  justify-content: center;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .not-found-code {
+    font-size: 6rem;
+  }
+  
+  .not-found-title {
+    font-size: 1.75rem;
+  }
+  
+  .not-found-description {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .not-found-code {
+    font-size: 5rem;
+  }
+  
+  .not-found-title {
+    font-size: 1.5rem;
+  }
+}

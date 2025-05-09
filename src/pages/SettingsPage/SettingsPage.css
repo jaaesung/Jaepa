@@ -1,0 +1,189 @@
+/* 설정 페이지 */
+.settings-page {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* 설정 헤더 */
+.settings-header {
+  margin-bottom: 2rem;
+}
+
+.settings-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.settings-description {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+/* 설정 콘텐츠 */
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* 설정 섹션 */
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.settings-section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+}
+
+/* 설정 카드 */
+.settings-card {
+  padding: 1.5rem;
+}
+
+.settings-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.settings-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+}
+
+/* 설정 성공 메시지 */
+.settings-success {
+  padding: 0.75rem;
+  margin-bottom: 1.5rem;
+  background-color: rgba(52, 168, 83, 0.1);
+  border: 1px solid var(--success-color);
+  border-radius: 4px;
+  color: var(--success-color);
+  font-size: 0.875rem;
+}
+
+/* 설정 오류 메시지 */
+.settings-error {
+  padding: 0.75rem;
+  margin-bottom: 1.5rem;
+  background-color: rgba(234, 67, 53, 0.1);
+  border: 1px solid var(--danger-color);
+  border-radius: 4px;
+  color: var(--danger-color);
+  font-size: 0.875rem;
+}
+
+/* 설정 폼 */
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.settings-form-group {
+  width: 100%;
+}
+
+.settings-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* 테마 설정 */
+.settings-theme {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.theme-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.theme-option.active .theme-preview {
+  border-color: var(--primary-color);
+}
+
+.theme-preview {
+  width: 160px;
+  height: 100px;
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.theme-preview-header {
+  height: 20px;
+}
+
+.theme-preview-content {
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
+}
+
+.theme-preview-content::before,
+.theme-preview-content::after {
+  content: '';
+  height: 8px;
+  border-radius: 4px;
+  width: 80%;
+}
+
+.light-theme {
+  background-color: #ffffff;
+}
+
+.light-theme .theme-preview-header {
+  background-color: #f1f3f4;
+}
+
+.light-theme .theme-preview-content::before,
+.light-theme .theme-preview-content::after {
+  background-color: #f1f3f4;
+}
+
+.dark-theme {
+  background-color: #202124;
+}
+
+.dark-theme .theme-preview-header {
+  background-color: #3c4043;
+}
+
+.dark-theme .theme-preview-content::before,
+.dark-theme .theme-preview-content::after {
+  background-color: #3c4043;
+}
+
+.theme-option-label {
+  font-size: 0.875rem;
+  color: var(--text-color);
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .settings-theme {
+    flex-direction: column;
+    align-items: center;
+  }
+}

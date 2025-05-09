@@ -1,0 +1,234 @@
+/* 주식 분석 페이지 */
+.stock-analysis-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 주식 분석 헤더 */
+.stock-analysis-header {
+  margin-bottom: 2rem;
+}
+
+.stock-analysis-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.stock-analysis-description {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+/* 주식 분석 검색 */
+.stock-analysis-search {
+  margin-bottom: 2rem;
+}
+
+/* 주식 분석 콘텐츠 */
+.stock-analysis-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+/* 주식 분석 메인 */
+.stock-analysis-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* 주식 차트 컨테이너 */
+.stock-chart-container {
+  width: 100%;
+}
+
+/* 주식 정보 컨테이너 */
+.stock-info-container {
+  width: 100%;
+}
+
+/* 주식 분석 사이드바 */
+.stock-analysis-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* 인기 주식 카드 */
+.popular-stocks-card {
+  padding: 1.5rem;
+}
+
+.popular-stocks-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--text-color);
+}
+
+/* 인기 주식 로딩 */
+.popular-stocks-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 인기 주식 빈 상태 */
+.popular-stocks-empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+/* 인기 주식 목록 */
+.popular-stocks-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* 인기 주식 항목 */
+.popular-stock-item {
+  margin-bottom: 0.5rem;
+}
+
+.popular-stock-item:last-child {
+  margin-bottom: 0;
+}
+
+.popular-stock-item.active .popular-stock-button {
+  background-color: var(--bg-light);
+  border-left: 3px solid var(--primary-color);
+}
+
+.popular-stock-button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.75rem;
+  background: none;
+  border: none;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s ease;
+}
+
+.popular-stock-button:hover {
+  background-color: var(--bg-light);
+}
+
+.popular-stock-symbol {
+  font-weight: 600;
+  color: var(--text-color);
+  margin-right: 0.75rem;
+  min-width: 50px;
+}
+
+.popular-stock-name {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 0.75rem;
+}
+
+.popular-stock-change {
+  font-size: 0.875rem;
+  font-weight: 500;
+  min-width: 60px;
+  text-align: right;
+}
+
+.popular-stock-change.positive {
+  color: var(--success-color);
+}
+
+.popular-stock-change.negative {
+  color: var(--danger-color);
+}
+
+/* 주식 분석 정보 카드 */
+.stock-analysis-info-card {
+  padding: 1.5rem;
+}
+
+.stock-analysis-info-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.stock-analysis-info-text {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  margin-bottom: 1.5rem;
+}
+
+.stock-analysis-info-subtitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--text-color);
+}
+
+.stock-analysis-info-list {
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.stock-analysis-info-list li {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+/* 반응형 */
+@media (max-width: 992px) {
+  .stock-analysis-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .stock-analysis-sidebar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .stock-analysis-title {
+    font-size: 1.5rem;
+  }
+  
+  .popular-stocks-card,
+  .stock-analysis-info-card {
+    padding: 1.25rem;
+  }
+}

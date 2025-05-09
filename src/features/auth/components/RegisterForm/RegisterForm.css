@@ -1,0 +1,73 @@
+/* 회원가입 폼 컨테이너 */
+.register-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100%;
+  padding: 2rem;
+}
+
+/* 회원가입 폼 */
+.register-form {
+  width: 100%;
+  max-width: 480px;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 회원가입 제목 */
+.register-title {
+  margin: 0 0 1.5rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+}
+
+/* 폼 그룹 */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+/* 약관 동의 */
+.form-agree {
+  margin-bottom: 1.5rem;
+}
+
+/* 폼 액션 */
+.form-actions {
+  margin-top: 2rem;
+}
+
+/* 폼 링크 */
+.form-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1.5rem;
+  gap: 0.75rem;
+}
+
+/* 로그인 링크 */
+.login-link {
+  color: #1a73e8;
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.login-link:hover {
+  text-decoration: underline;
+}
+
+/* 회원가입 오류 메시지 */
+.register-error {
+  padding: 0.75rem;
+  margin-bottom: 1.5rem;
+  background-color: #fdeded;
+  border: 1px solid #f5c2c7;
+  border-radius: 4px;
+  color: #842029;
+  font-size: 0.875rem;
+}

@@ -1,0 +1,107 @@
+/* 감성 분석 페이지 */
+.sentiment-analysis-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 감성 분석 헤더 */
+.sentiment-analysis-header {
+  margin-bottom: 2rem;
+}
+
+.sentiment-analysis-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.sentiment-analysis-description {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+/* 감성 분석 콘텐츠 */
+.sentiment-analysis-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* 감성 분석 메인 */
+.sentiment-analysis-main {
+  width: 100%;
+}
+
+/* 감성 분석 트렌드 */
+.sentiment-analysis-trend {
+  width: 100%;
+}
+
+/* 감성 분석 정보 */
+.sentiment-analysis-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* 감성 정보 카드 */
+.sentiment-info-card {
+  padding: 1.5rem;
+}
+
+.sentiment-info-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.sentiment-info-text {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  margin-bottom: 1.5rem;
+}
+
+.sentiment-info-subtitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--text-color);
+}
+
+.sentiment-info-list {
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.sentiment-info-list li {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.sentiment-info-steps {
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.sentiment-info-steps li {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .sentiment-analysis-title {
+    font-size: 1.5rem;
+  }
+  
+  .sentiment-info-card {
+    padding: 1.25rem;
+  }
+}

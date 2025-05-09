@@ -5,7 +5,8 @@ JaePa 크롤링 패키지
 """
 
 # 주요 클래스 가져오기
-from .news_crawler import NewsCrawler, SentimentAnalyzer
-from .stock_data_crawler import StockDataCrawler
+from .collectors.news_collector import NewsCrawler
+from .collectors.stock_collector import StockDataCrawler
+from .processors.sentiment_analyzer import FinancialSentimentAnalyzer
 
-__all__ = ['NewsCrawler', 'SentimentAnalyzer', 'StockDataCrawler']
+__all__ = ['NewsCrawler', 'StockDataCrawler', 'FinancialSentimentAnalyzer']

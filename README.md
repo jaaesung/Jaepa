@@ -34,7 +34,7 @@ python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 
 # 필요한 패키지 설치
-pip install -r requirements.txt
+pip install -r config/backend/requirements.txt
 
 # 환경 설정
 cp .env.example .env
@@ -44,32 +44,69 @@ cp .env.example .env
 ### 실행 방법
 
 ```bash
-# CLI 인터페이스 실행
-python main.py
+# 백엔드 서버 실행
+python backend/main.py
+
+# 프론트엔드 서버 실행
+npm start
+
+# 크롤링 스케줄러 실행
+python crawling/scheduler.py
+
+# Docker를 사용한 실행
+npm run docker:up
 ```
 
 ## 프로젝트 구조
 
 ```
 jaepa/
-├── backend/           # 백엔드 API 서버
-│   ├── app/           # 애플리케이션 코드
-│   ├── api/           # REST API
-│   └── README.md      # 백엔드 문서
+├── src/                # 프론트엔드 코드
+│   ├── assets/         # 정적 자산 파일들
+│   ├── components/     # UI 컴포넌트
+│   ├── core/           # 핵심 공통 코드
+│   ├── features/       # 기능별 모듈
+│   ├── pages/          # 페이지 컴포넌트
+│   ├── routes/         # 라우팅 관련
+│   ├── services/       # 외부 서비스와의 통신
+│   ├── store/          # 글로벌 상태 관리
+│   ├── App.tsx         # 앱 진입점 컴포넌트
+│   └── index.tsx       # React 렌더링 진입점
 │
-├── crawling/          # 데이터 크롤링 모듈
-│   ├── config.json    # 크롤링 설정
-│   ├── news_crawler.py # 뉴스 크롤러
-│   └── README.md      # 크롤링 문서
+├── backend/            # 백엔드 코드
+│   ├── api/            # API 모듈
+│   ├── core/           # 핵심 기능 모듈
+│   ├── main.py         # 백엔드 진입점
+│   └── __init__.py
 │
-├── docs/              # 프로젝트 문서
-│   ├── api.md         # API 문서
-│   ├── architecture.md # 아키텍처 문서
-│   └── README.md      # 문서 목록
+├── crawling/           # 크롤링 모듈
+│   ├── collectors/     # 데이터 수집기
+│   ├── processors/     # 데이터 처리기
+│   ├── config/         # 크롤링 설정
+│   ├── utils/          # 크롤링 유틸리티
+│   ├── scheduler.py    # 크롤링 스케줄러
+│   └── __init__.py
 │
-├── project_status.md  # 현재 프로젝트 상태 요약
-├── CHANGELOG.md       # 변경 이력
-├── TODO.md            # 할 일 목록
-├── .env.example       # 환경 변수 예시
-└── README.md          # 프로젝트 개요
+├── config/             # 전역 설정
+│   ├── frontend/       # 프론트엔드 설정
+│   │   ├── craco.config.js
+│   │   ├── tsconfig.json
+│   │   ├── tsconfig.paths.json
+│   │   └── jest.config.js
+│   ├── backend/        # 백엔드 설정
+│   │   ├── requirements.txt
+│   │   └── pytest.ini
+│   ├── docker/         # Docker 설정
+│   │   ├── Dockerfile
+│   │   └── docker-compose.yml
+│   ├── environments/   # 환경별 설정
+│   └── __init__.py
+│
+├── tests/              # 테스트 코드
+│
+├── logs/               # 로그 파일
+│
+├── .env.example        # 환경 변수 예시
+├── package.json        # npm 패키지 설정
+└── README.md           # 프로젝트 문서
 ```
