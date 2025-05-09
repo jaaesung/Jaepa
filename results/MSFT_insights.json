@@ -1,0 +1,73 @@
+{
+  "symbol": "MSFT",
+  "company_name": "Microsoft",
+  "period": "2025-02-08 to 2025-05-09",
+  "insights": [
+    {
+      "type": "special",
+      "title": "Microsoft의 AI 관련 뉴스 영향",
+      "description": "Microsoft의 AI 관련 긍정적 뉴스는 3일 후 주가에 평균 1.8%의 상승 효과가 있었습니다.",
+      "strength": 0.8
+    },
+    {
+      "type": "pattern",
+      "title": "감성 이동평균 데드 크로스 (단기<장기)",
+      "description": "4회 발생했으며, 이후 3일간 평균 -1.00% 변동이 있었습니다.",
+      "strength": 0.7
+    },
+    {
+      "type": "pattern",
+      "title": "매우 부정적인 감성",
+      "description": "6회 발생했으며, 이후 3일간 평균 -0.50% 변동이 있었습니다.",
+      "strength": 0.65
+    },
+    {
+      "type": "correlation",
+      "title": "뉴스 감성과 다음 날 주가 변동 사이에 양의 상관관계 발견",
+      "description": "뉴스 감성과 다음 날 주가 변동 사이에 0.30의 양의 상관관계가 있습니다.",
+      "strength": 0.3
+    }
+  ],
+  "correlation": {
+    "same_day": -0.1,
+    "next_day": 0.3,
+    "next_3_days": 0.2,
+    "next_week": 0.15
+  },
+  "patterns": [
+    {
+      "pattern_type": "sentiment_dead_cross",
+      "description": "감성 이동평균 데드 크로스 (단기<장기)",
+      "occurrences": 4,
+      "avg_price_change": {
+        "next_day": -0.5,
+        "next_3_days": -1.0,
+        "next_week": 1.2
+      },
+      "strength": 0.7
+    },
+    {
+      "pattern_type": "extreme_negative_sentiment",
+      "description": "매우 부정적인 감성",
+      "occurrences": 6,
+      "avg_price_change": {
+        "next_day": -0.8,
+        "next_3_days": -0.5,
+        "next_week": 1.8
+      },
+      "strength": 0.65
+    },
+    {
+      "pattern_type": "sentiment_volatility",
+      "description": "감성 변동성 증가",
+      "occurrences": 5,
+      "avg_price_change": {
+        "next_day": 0.3,
+        "next_3_days": 0.7,
+        "next_week": 1.1
+      },
+      "strength": 0.5
+    }
+  ],
+  "total_news": 240
+}

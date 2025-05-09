@@ -97,29 +97,18 @@ class GDELTClient:
 
         Args:
             query: 검색어 (GDELT 쿼리 형식)
-            start_date: 시작 날짜 (기본값: 7일 전)
-            end_date: 종료 날짜 (기본값: 현재)
+            start_date: 시작 날짜 (기본값: 7일 전, 현재 사용되지 않음)
+            end_date: 종료 날짜 (기본값: 현재, 현재 사용되지 않음)
             max_records: 최대 검색 결과 수 (기본값: 250, 최대 250)
             format_type: 응답 형식 (json, csv, html)
 
         Returns:
             List[Dict[str, Any]]: 검색 결과 목록
         """
-        # 날짜 범위 설정
-        if end_date is None:
-            end_date = datetime.now()
-        if start_date is None:
-            start_date = end_date - timedelta(days=7)
-
-        # 날짜 형식 변환
-        start_str = start_date.strftime("%Y%m%d%H%M%S")
-        end_str = end_date.strftime("%Y%m%d%H%M%S")
-
-        # 쿼리 파라미터 구성
+        # 쿼리 파라미터 구성 (timespan 없이)
         params = {
             "query": query,
             "format": format_type,
-            "timespan": f"{start_str} {end_str}",
             "maxrecords": max_records,
             "sort": "DateDesc"  # 최신순 정렬
         }
@@ -141,10 +130,16 @@ class GDELTClient:
 
             # JSON 파싱
             if format_type == "json":
-                response = json.loads(response_text)
-                articles = response.get("articles", [])
-                logger.info(f"GDELT에서 {len(articles)}개 뉴스 검색됨")
-                return articles
+                try:
+                    response = json.loads(response_text)
+                    articles = response.get("articles", [])
+                    logger.info(f"GDELT에서 {len(articles)}개 뉴스 검색됨")
+                    return articles
+                except json.JSONDecodeError as e:
+                    logger.error(f"JSON 파싱 오류: {str(e)}")
+                    # 응답 내용 로깅 (디버깅용)
+                    logger.debug(f"응답 내용: {response_text[:200]}...")
+                    return []
             else:
                 logger.error(f"지원하지 않는 형식: {format_type}")
                 return []
@@ -165,8 +160,8 @@ class GDELTClient:
         Args:
             keywords: 검색 키워드 (문자열 또는 목록)
             symbols: 주식 심볼 목록 (예: ["AAPL", "MSFT"])
-            start_date: 시작 날짜
-            end_date: 종료 날짜
+            start_date: 시작 날짜 (현재 사용되지 않음)
+            end_date: 종료 날짜 (현재 사용되지 않음)
             max_records: 최대 검색 결과 수
 
         Returns:
@@ -190,11 +185,9 @@ class GDELTClient:
         # 최종 쿼리 구성
         query = f"({keyword_str}){symbol_query} AND {finance_terms}"
 
-        # 뉴스 검색
+        # 뉴스 검색 (timespan 없이)
         articles = self.search_news(
             query=query,
-            start_date=start_date,
-            end_date=end_date,
             max_records=max_records
         )
 
@@ -289,14 +282,14 @@ class GDELTClient:
 
         Args:
             symbol: 주식 심볼 (예: AAPL)
-            start_date: 시작 날짜 (기본값: 1년 전)
-            end_date: 종료 날짜 (기본값: 현재)
+            start_date: 시작 날짜 (기본값: 1년 전, 현재 사용되지 않음)
+            end_date: 종료 날짜 (기본값: 현재, 현재 사용되지 않음)
             max_records: 최대 검색 결과 수
 
         Returns:
             List[Dict[str, Any]]: 검색 결과 목록
         """
-        # 날짜 범위 설정
+        # 날짜 범위 로깅 (실제로는 사용되지 않음)
         if end_date is None:
             end_date = datetime.now()
         if start_date is None:
@@ -307,33 +300,15 @@ class GDELTClient:
         if symbol in self.company_names:
             keywords.append(self.company_names[symbol])
 
-        # 기간이 길 경우 여러 번 나누어 검색
-        all_articles = []
-        current_start = start_date
+        # 단일 검색으로 변경 (GDELT API가 timespan을 지원하지 않음)
+        articles = self.search_financial_news(
+            keywords=keywords,
+            symbols=[symbol],
+            max_records=min(250, max_records)  # GDELT API 한 번에 최대 250개
+        )
 
-        while current_start < end_date and len(all_articles) < max_records:
-            # 최대 3개월 단위로 검색
-            current_end = min(current_start + timedelta(days=90), end_date)
-
-            articles = self.search_financial_news(
-                keywords=keywords,
-                symbols=[symbol],
-                start_date=current_start,
-                end_date=current_end,
-                max_records=min(250, max_records - len(all_articles))  # GDELT API 한 번에 최대 250개
-            )
-
-            all_articles.extend(articles)
-            logger.info(f"{symbol} 관련 뉴스 {len(articles)}개 검색됨 ({current_start.strftime('%Y-%m-%d')} ~ {current_end.strftime('%Y-%m-%d')})")
-
-            # 다음 기간으로 이동
-            current_start = current_end + timedelta(days=1)
-
-            # API 요청 간격 조절
-            time.sleep(2.0)
-
-        logger.info(f"{symbol} 관련 과거 뉴스 총 {len(all_articles)}개 검색됨 ({start_date.strftime('%Y-%m-%d')} ~ {end_date.strftime('%Y-%m-%d')})")
-        return all_articles
+        logger.info(f"{symbol} 관련 과거 뉴스 총 {len(articles)}개 검색됨 ({start_date.strftime('%Y-%m-%d')} ~ {end_date.strftime('%Y-%m-%d')})")
+        return articles
 
     def get_market_sentiment(self, days: int = 1) -> Dict[str, Any]:
         """
@@ -398,14 +373,14 @@ class GDELTClient:
 
         Args:
             symbol: 주식 심볼 (예: AAPL)
-            start_date: 시작 날짜 (기본값: 30일 전)
-            end_date: 종료 날짜 (기본값: 현재)
+            start_date: 시작 날짜 (기본값: 30일 전, 현재 사용되지 않음)
+            end_date: 종료 날짜 (기본값: 현재, 현재 사용되지 않음)
             interval: 시간 간격 ('hour', 'day', 'week', 'month')
 
         Returns:
             Dict[str, Any]: 감성 트렌드 분석 결과
         """
-        # 날짜 범위 설정
+        # 날짜 범위 설정 (로깅용)
         if end_date is None:
             end_date = datetime.now()
         if start_date is None:
@@ -418,12 +393,10 @@ class GDELTClient:
             else:  # month
                 start_date = end_date - timedelta(days=365)
 
-        # 뉴스 수집
+        # 뉴스 수집 (단일 검색)
         articles = self.get_historical_news_by_symbol(
             symbol=symbol,
-            start_date=start_date,
-            end_date=end_date,
-            max_records=1000
+            max_records=250
         )
 
         if not articles:
@@ -685,24 +658,22 @@ class GDELTClient:
 
         Args:
             symbol: 주식 심볼 (예: AAPL)
-            start_date: 시작 날짜 (기본값: 90일 전)
-            end_date: 종료 날짜 (기본값: 현재)
+            start_date: 시작 날짜 (기본값: 90일 전, 현재 사용되지 않음)
+            end_date: 종료 날짜 (기본값: 현재, 현재 사용되지 않음)
             stock_data: 주가 데이터 (외부에서 제공하는 경우)
 
         Returns:
             Dict[str, Any]: 감성-주가 상관관계 분석 결과
         """
-        # 날짜 범위 설정
+        # 날짜 범위 설정 (로깅용)
         if end_date is None:
             end_date = datetime.now()
         if start_date is None:
             start_date = end_date - timedelta(days=90)  # 기본값: 90일 전
 
-        # 감성 트렌드 가져오기
+        # 감성 트렌드 가져오기 (단일 검색)
         sentiment_data = self.get_news_sentiment_trends(
             symbol=symbol,
-            start_date=start_date,
-            end_date=end_date,
             interval='day'
         )
 
